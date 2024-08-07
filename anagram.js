@@ -76,7 +76,7 @@ function startGame() {
 
   dict = dictionaries[language_ind][dict_ind];
 
-  fetch(`${dict}.json`)
+  fetch(`dictionaries/${dict}.json`)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -176,7 +176,7 @@ function editLetters() {
 }
 
 function generateLetters() {
-  fetch("english.json")
+  fetch(`anagrams/${language}.json`)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
@@ -207,6 +207,7 @@ function generateLetters() {
 function checkDict() {
   for (var i = 0; i < document.getElementsByClassName("language").length; i++) {
     if (document.getElementsByClassName("language")[i].selected == true) {
+      languages = document.getElementsByClassName("language")[i].innerHTML.toLowerCase();
       document.getElementsByClassName("all_dict")[0].innerHTML = "";
       for (var j = 0; j < dictionaries[i].length; j++) {
         document.getElementsByClassName("all_dict")[0].innerHTML +=
