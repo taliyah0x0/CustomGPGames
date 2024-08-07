@@ -176,7 +176,7 @@ function editLetters() {
 }
 
 function generateLetters() {
-  fetch(`anagrams/${language}.json`)
+  fetch(`anagrams/${languages}.json`)
     .then((response) => {
       if (!response.ok) {
         throw new Error("Network response was not ok");
