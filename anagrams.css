@@ -1,0 +1,67 @@
+html {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: black;
+  font-family: Arial;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+input[type="checkbox"] {
+  appearance: none; /* Remove default styling */
+  height: 1.25rem; /* Equivalent to h-5 */
+  width: 1.25rem; /* Equivalent to w-5 */
+  border: 2px solid #4E44E4; /* Equivalent to border-gray-300 */
+  border-radius: 0.25rem; /* Equivalent to rounded-md */
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+input[type="checkbox"]:checked {
+  background-color: #4E44E4; /* Equivalent to bg-blue-500 */
+  border-color: transparent; /* Equivalent to border-transparent */
+}
+input[type="checkbox"]:checked::after {
+  content: '✓';
+  font-size: 1rem; /* Adjust checkmark size */
+  color: white; /* Checkmark color */
+}
+
+.select:hover {
+  cursor: pointer;
+}
+
+input[type="radio"] {
+  appearance: none; /* Remove default styling */
+  height: 1.25rem; /* Equivalent to h-5 */
+  width: 1.25rem; /* Equivalent to w-5 */
+  border: 2px solid #4E44E4; /* Equivalent to border-gray-300 */
+  border-radius: 50%; /* Make it round */
+  background-color: white;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+input[type="radio"]:checked {
+  background-color: #4E44E4; /* Equivalent to bg-blue-500 */
+  border-color: transparent; /* Equivalent to border-transparent */
+}
+input[type="radio"]:checked::after {
+  content: '';
+  height: 0.625rem; /* Smaller inner circle */
+  width: 0.625rem; /* Smaller inner circle */
+  background-color: white; /* Inner circle color */
+  border-radius: 50%; /* Make it round */
+}
+input[type="radio"]:disabled {
+  background-color: none; /* Equivalent to bg-blue-500 */
+  border-color: lightgray; /* Equivalent to border-transparent */
+}
