@@ -12,6 +12,7 @@ body {
   padding: 0;
   display: flex;
   justify-content: center;
+  overflow: hidden;
 }
 
 input[type="checkbox"] {
@@ -64,4 +65,12 @@ input[type="radio"]:checked::after {
 input[type="radio"]:disabled {
   background-color: none; /* Equivalent to bg-blue-500 */
   border-color: lightgray; /* Equivalent to border-transparent */
+}
+
+.floating-text {
+  position: absolute;
+  bottom: 140px;
+  font-size: 15px;
+  color: red;
+  font-weight: bold;
 }

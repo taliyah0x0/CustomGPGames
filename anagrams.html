@@ -24,26 +24,26 @@
             <div class="border-b border-gray-900/10 pb-5 mt-5">
                <h1 class="text-3xl font-semibold leading-7 text-gray-900">Anagrams</h1>
                <fieldset class="border-t border-gray-900/10 mt-4">
-                  <div class="mt-6">
+                  <div class="mt-4">
                     <legend class="text-sm font-semibold text-gray-900">Language</legend>
-                    <select id="dropdown" name="dropdown" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2 select" onchange="checkDict()">
+                    <select title="languages" id="dropdown" name="dropdown" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2 select" onchange="checkDict()">
                         <option value="English" class="language" selected>English</option>
                         <option value="Spanish" class="language">Spanish</option>
                       <option value="French" class="language">French</option>
-                        <option value="Mandarin" class="language">Mandarin</option>
                       <option value="Japanese" class="language">Japanese</option>
-                      <option value="Korean" class="language">Korean</option>
+                        <option disabled value="Mandarin" class="language">Mandarin</option>
+                      <option disabled value="Korean" class="language">Korean</option>
                     </select>
                   </div>
                </fieldset>
 
               <fieldset>
-                  <div class="mt-6">
+                  <div class="mt-4">
                     <legend class="text-sm font-semibold text-gray-900">Dictionary</legend>
-                     <div class="flex items-center mt-2 all_dict">
-                       <label class="block text-sm font-medium leading-6 text-gray-900 items-center flex select mr-5"><input name="dictionary" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 dictionary select" checked><div class="ml-2 dict">Collins 2021</div></label>
-                       <label class="block text-sm font-medium leading-6 text-gray-900 items-center flex select mr-5"><input name="dictionary" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 dictionary select"><div class="ml-2 dict">Collins 2015</div></label>
-                     </div>
+                    <select id="dictionary" title="dictionary" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2 select" onchange="checkDict()">
+                     <option value="Collins 2021" class="dict" selected>Collins 2021</option>
+                     <option value="Collins 2015" class="dict">Collins 2015</option>
+                 </select>
                   </div>
                </fieldset>
               
@@ -53,7 +53,7 @@
                      <div class="flex items-center gap-x-5 mt-2" onclick="editLetters()">
                         <label class="block text-sm font-medium leading-6 text-gray-900 items-center flex gap-x-2 select"><input name="num_letters" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 num_letters select" checked>6 Letters</label>
                         <label class="block text-sm font-medium leading-6 text-gray-900 items-center flex gap-x-2 select"><input name="num_letters" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 num_letters select">7 Letters</label>
-                        <label class="block text-sm font-medium leading-6 text-gray-400 items-center flex gap-x-2 select"><input name="num_letters" id="custom" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600" disabled>Custom:<input type="number" id="custom_letter" class="w-12 h-10 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center" value="8" disabled min="0" max="9"></label>
+                        <label class="block text-sm font-medium leading-6 text-gray-900 items-center flex gap-x-2 select"><input name="num_letters" id="custom" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">Custom:<input type="number" id="custom_letter" class="w-12 h-10 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center" value="8" disabled min="0" max="9"></label>
                      </div>
                   </div>
                </fieldset>
@@ -79,7 +79,7 @@
                            <div class="text-sm leading-6">
                               <label for="timer" class="font-medium text-gray-900 select">Timer</label>
                            </div>
-                           <input type="number" class="w-14 h-10 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center time" value="00" onblur="checkTime(0)" id="min">:<input type="number" class="w-14 h-10 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center time" value="60" onblur="checkTime(1)" id="sec">
+                           <input type="number" title="number" class="w-14 h-10 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center time" value="00" onblur="checkTime(0)" id="min">:<input type="number" title="minute" class="w-14 h-10 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center time" value="60" onblur="checkTime(1)" id="sec">
                         </div>
                         <div class="relative flex gap-x-4 mt-5">
                            <div class="flex h-6 items-center gap-x-2">

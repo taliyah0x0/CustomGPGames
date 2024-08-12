@@ -33,7 +33,7 @@ let dict = dictionaries[0][0];
 
 function startGame() {
   game_start = true;
-  for (var i = 0; i < 6; i++) {
+  for (var i = 0; i < num_letters; i++) {
     let letter_value = document.getElementsByClassName("letter")[i].value;
     letter_inputs.push(letter_value.toUpperCase());
   }
@@ -67,9 +67,9 @@ function startGame() {
   }
 
   let dict_ind;
-  let dicts = document.getElementsByClassName("dictionary");
+  let dicts = document.getElementsByClassName("dict");
   for (var i = 0; i < dicts.length; i++) {
-    if (dicts[i].checked == true) {
+    if (dicts[i].selected == true) {
       dict_ind = i;
     }
   }
@@ -90,13 +90,6 @@ function startGame() {
       filteredArray = combinedArray.filter((word) => word.length <= 9);
     })
     .catch((error) => console.error("Error loading JSON:", error));
-
-  document.addEventListener("keydown", function (event) {
-    // Check if the key is a letter
-    if (event.key == "Enter" && game_start == false) {
-      startGame();
-    }
-  });
 
   document.getElementsByTagName("body")[0].innerHTML = "";
   game = new Phaser.Game(config);
@@ -135,9 +128,13 @@ function editLetters() {
   let option = document.getElementById("custom").checked;
   if (option == false) {
     document.getElementById("custom_letter").disabled = true;
+    document.getElementById("custom_letter").classList.remove("text-gray-900");
+    document.getElementById("custom_letter").classList.add("text-gray-400");
   } else {
     document.getElementById("custom_letter").disabled = false;
     num_letters = document.getElementById("custom_letter").value;
+    document.getElementById("custom_letter").classList.add("text-gray-900");
+    document.getElementById("custom_letter").classList.remove("text-gray-400");
   }
 
   if (document.getElementsByClassName("num_letters")[0].checked == true) {
@@ -151,18 +148,32 @@ function editLetters() {
   document.getElementById("letters").innerHTML = "";
   for (var i = 0; i < num_letters; i++) {
     document.getElementById("letters").innerHTML +=
-      `<input type="text" class="w-10 h-10 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center letter uppercase" maxlength="1">`;
+      `<input type="text" class="w-9 h-9 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center letter uppercase">`;
   }
 
   const inputs = document.querySelectorAll(".letter");
 
   inputs.forEach((input, index) => {
     input.addEventListener("input", () => {
-      if (input.value.length === input.maxLength) {
+      if (languages != 'japanese' && languages != 'french') {
+        input.value = input.value.split('').map(char => alphabet.includes(char.toUpperCase()) ? char : '').join('');
+      } else if (alphabet.includes(input.value.toUpperCase().substring(0,1))) {
+        inputs[index + 1].value = input.value.substring(1);
+        inputs[index + 1].focus();
+        input.value = input.value.substring(0,1);
+      }
+
+      if (languages != 'japanese' && languages != 'french' && input.value.length >= 1 && input.value != '´') {
+        input.value = input.value.substring(0,1);
         if (index < inputs.length - 1) {
           inputs[index + 1].focus();
         }
       }
+    });
+
+    input.addEventListener('blur', function() {
+      input.value = input.value.substring(0,1);
+      input.value = input.value.split('').map(char => alphabet.includes(char.toUpperCase()) ? char : '').join('');
     });
 
     input.addEventListener("keydown", (event) => {
@@ -173,6 +184,8 @@ function editLetters() {
       }
     });
   });
+
+  
 }
 
 function generateLetters() {
@@ -207,14 +220,19 @@ function generateLetters() {
 function checkDict() {
   for (var i = 0; i < document.getElementsByClassName("language").length; i++) {
     if (document.getElementsByClassName("language")[i].selected == true) {
+      alphabet = alphabets[i];
+      const inputs = document.querySelectorAll(".letter");
+      inputs.forEach((input) => {
+        input.value = input.value.split('').map(char => alphabet.includes(char.toUpperCase()) ? char : '').join('');
+      });
       languages = document.getElementsByClassName("language")[i].innerHTML.toLowerCase();
-      document.getElementsByClassName("all_dict")[0].innerHTML = "";
+      document.getElementById("dictionary").innerHTML = "";
       for (var j = 0; j < dictionaries[i].length; j++) {
-        document.getElementsByClassName("all_dict")[0].innerHTML +=
-          `<label class="block text-sm font-medium leading-6 text-gray-900 items-center flex mr-5 select"><input type="radio" name="dictionary" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 dictionary"><div class="dict ml-2"></div></label>`;
-        document.getElementsByClassName("dict")[j].innerHTML = dictionary_names[i][j];
+        document.getElementById("dictionary").innerHTML +=
+          `<option value="Collins 2021" class="dict"></option>`
+          document.getElementsByClassName("dict")[j].innerHTML = dictionary_names[i][j];
       }
     }
   }
-  document.getElementsByClassName("dictionary")[0].checked = true;
+  document.getElementsByClassName("dict")[0].selected = true;
 }
