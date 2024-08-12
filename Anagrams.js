@@ -17,7 +17,8 @@ class Anagrams extends SimpleScene {
   }
 
   init() {
-
+    document.getElementsByTagName("div")[0].style.display = 'flex';
+    document.getElementsByTagName("div")[0].style.justifyContent = 'center';
   }
 
   preload() {
@@ -32,20 +33,14 @@ class Anagrams extends SimpleScene {
     for (var i = 0; i < 26; i++) {
       this.load.image(alphabet[i], "en-letters/regular/" + alphabet[i] + ".png");
       this.load.image(alphabet[i] + "_in", "en-letters/inverted/" + alphabet[i] + ".png");
-      this.load.image(alphabet[i] + "_pr", "en-letters/temp/" + alphabet[i] + ".png");
     }
 
     for (var i = 0; i < 10; i++) {
       this.load.image(i.toString() + "_p", "numbers/points/" + i + ".png");
       this.load.image(i.toString() + "_w", "numbers/words/" + i + ".png");
       this.load.image(i.toString() + "_t", "numbers/timer/" + i + ".png");
-      this.load.image(i.toString() + "_pr", "en-letters/temp/" + i + ".png");
     }
     this.load.image(":_t", "numbers/timer/:.png");
-    this.load.image("(_pr", "en-letters/temp/(.png");
-    this.load.image(")_pr", "en-letters/temp/).png");
-    this.load.image("+_pr", "en-letters/temp/+.png");
-    this.load.image(" _pr", "en-letters/temp/ .png");
 
     this.load.image("buttons", "images/buttons.png");
     
@@ -204,8 +199,6 @@ class Anagrams extends SimpleScene {
       this.endButton.setAlpha(0);
     }
 
-    this.tempWords = [];
-
     this.shuffleButton = this.add.rectangle(deviceWidth * (80 / iphoneWidth) + deviceWidth, deviceHeight * (135 / iphoneHeight), deviceWidth * (95 / iphoneWidth), deviceHeight * (95 / iphoneHeight), 0xffffff);
     this.shuffleButton.setAlpha(0.01);
     this.shuffleButton.enableClick();
@@ -263,19 +256,6 @@ class Anagrams extends SimpleScene {
     if (this.enter.wasClicked()) {
     this.enterWord();
     }
-
-    /*for (var i = 0; i < this.tempWords.length; i++) {
-      if (this.tempWords[i][0].y < deviceHeight * (1320 / iphoneHeight) - text_offset * 50) {
-        this.tempWords[i].forEach(sprite => {
-          this.tweens.add({
-            targets: sprite,
-            alpha: 0,
-            duration: 200,
-            ease: 'Power1',
-          });
-        });
-      }
-    }*/
 
     if (this.shuffleButton.wasClicked()) {
       if (sound == 1) {
@@ -403,11 +383,11 @@ class Anagrams extends SimpleScene {
       this.valid[input_word.length - 3].play();
       }
 
-      this.wordView(input_word, "+" + point_val[input_word.length - 3], 0xffffff);
+      this.wordView(input_word, "+" + point_val[input_word.length - 3], 'white');
 
     } else if (filteredArray.includes(input_word) == false) {
 
-      this.wordView(input_word, "Not in the vocabulary", 0xffb4b6);
+      this.wordView(input_word, "Not in the vocabulary", 'red');
 
       if (sound == 1) {
       this.wrong.play();
@@ -415,7 +395,7 @@ class Anagrams extends SimpleScene {
 
     } else if (words.includes(input_word)) {
 
-      this.wordView(input_word, "Already used", 0xffb4b6);
+      this.wordView(input_word, "Already used", 'red');
 
       if (sound == 1) {
       this.wrong.play();
@@ -435,25 +415,15 @@ class Anagrams extends SimpleScene {
 
   wordView(input, val, color) {
     let preview = input.toUpperCase() + " (" + val + ")";
-    document.getElementsByTagName("div")[0].innerHTML += `
-    <div class="floating-text">${preview}</div>`;
-    document.getElementsByTagName("div")[0].style.display = 'flex';
-    document.getElementsByTagName("div")[0].style.justifyContent = 'center';
-    /*let preview = input.toUpperCase();
-    this.tempWords.push([]);
-    for (var i = 0; i < preview.length; i++) {
-      let tempChar = this.add.sprite(deviceWidth * 0.5 + (i - preview.length / 2) * (deviceWidth * (35 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight), preview[i] + "_pr");
-      tempChar.setOrigin(0.5, 0.5);
-      tempChar.setScale(scaleFactor);
-      tempChar.setTint(color);
-      this.tempWords[this.tempWords.length - 1].push(tempChar);
+    document.getElementsByTagName("div")[0].innerHTML += `<div class="floating-text">${preview}</div>`;
+    let chain = document.getElementsByClassName('floating-text');
+    if (color == 'red') {
+      document.getElementsByClassName("floating-text")[chain.length - 1].style.color = '#eda9b0';
     }
-    this.words.forEach(sprite => {
-      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
-    });
-    this.tempWords[this.tempWords.length - 1].forEach(sprite => {
-      this.addTween(sprite, sprite.x, sprite.y - deviceHeight * (220 / iphoneHeight), 1000);
-    });*/
+    setTimeout(() => {
+      document.getElementsByClassName("floating-text")[chain.length - 1].style.bottom = '220px';
+      document.getElementsByClassName("floating-text")[chain.length - 1].style.opacity = '0';
+    }, 1);
   }
 
     moveLetter(i) {
