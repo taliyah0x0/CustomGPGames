@@ -9,6 +9,7 @@ let setup = false;
 let keydown = false;
 let gameScreen = 0;
 let denominator;
+let letter_stage = {};
 
 class Anagrams extends SimpleScene {
 
@@ -31,14 +32,16 @@ class Anagrams extends SimpleScene {
     this.load.image("endButton", "images/endbutton.png");
 
     for (var i = 0; i < 26; i++) {
-      this.load.image(alphabet[i], "en-letters/regular/" + alphabet[i] + ".png");
-      this.load.image(alphabet[i] + "_in", "en-letters/inverted/" + alphabet[i] + ".png");
+      this.load.image(alphabet[i], `${languages}-letters/regular/` + alphabet[i] + ".png");
+      this.load.image(alphabet[i] + "_in", `${languages}-letters/inverted/` + alphabet[i] + ".png");
+      this.load.image(alphabet[i] + "_f", `${languages}-letters/final/` + alphabet[i] + ".png");
     }
 
     for (var i = 0; i < 10; i++) {
       this.load.image(i.toString() + "_p", "numbers/points/" + i + ".png");
       this.load.image(i.toString() + "_w", "numbers/words/" + i + ".png");
       this.load.image(i.toString() + "_t", "numbers/timer/" + i + ".png");
+      this.load.image(i.toString() + "_f", "numbers/final/" + i + ".png");
     }
     this.load.image(":_t", "numbers/timer/:.png");
 
@@ -61,6 +64,9 @@ class Anagrams extends SimpleScene {
     denominator = num_letters;
     if (num_letters <= 6) {
       denominator = 6;
+    }
+    for (let i = 0; i < num_letters; i++) {
+      letter_stage[letter_inputs[i]] = 0;
     }
 
     this.select = this.sound.add("select", { loop: false });
@@ -219,17 +225,24 @@ class Anagrams extends SimpleScene {
           this.moveLetter(letter_chosen[letter_chosen.length - 1]);
         }
 
-          if (event.key.length === 1 && event.key.match(/[a-z]/i) && gameScreen == 1 && letter_inputs.includes(event.key.toUpperCase())) {
-              keydown = true;
-            if (curr_inputs.includes(event.key.toUpperCase())) {
-              this.moveLetter(curr_inputs.indexOf(event.key.toUpperCase()));
-            } else {
-              this.moveLetter(letter_inputs.indexOf(event.key.toUpperCase()));
+        if (event.key.length === 1 && event.key.match(/[a-z]/i) && gameScreen == 1 && letter_inputs.includes(event.key.toUpperCase())) {
+          keydown = true;
+          if (letter_stage[event.key.toUpperCase()] == 0) {
+            this.moveLetter(curr_inputs.indexOf(event.key.toUpperCase()));
+            if (curr_inputs.includes(event.key.toUpperCase()) == false) {
+              letter_stage[event.key.toUpperCase()] = 1;
+            }
+          } else {
+            this.moveLetter(letter_chosen[letter_chain.indexOf(event.key.toUpperCase())]);
+            if (letter_chain.includes(event.key.toUpperCase()) == false) {
+              letter_stage[event.key.toUpperCase()] = 0;
             }
           }
+        }
       });
       setup = true;
     }
+
 
     if (this.startButton.wasClicked()) {
       this.startGame();
@@ -479,7 +492,8 @@ class Anagrams extends SimpleScene {
           this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 200);
           this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 200);
           this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 200);
-          }
+          this.addTween(this.dishes[i], this.dishes[i].x - deviceWidth, this.dishes[i].y, 200);
+        }
 
       this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 200);
 
@@ -495,13 +509,16 @@ class Anagrams extends SimpleScene {
 
       this.addTween(this.endScreen, 0.5 * deviceWidth, this.endScreen.y, 200);
 
-      setTimeout (() => {
-        this.wordsEnd = this.add.text(deviceWidth * (200 / iphoneWidth), deviceHeight * (580 / iphoneHeight), num_words);
-        this.wordsEnd.setOrigin(0, 0.5);
-        this.wordsEnd.setFontSize(deviceHeight * (35 / iphoneHeight));
-        this.wordsEnd.y -= text_offset * 35;
-        this.wordsEnd.setFontColor(0x00000)
-        this.wordsEnd.setFontFamily("Arial Black");
+      let num_string = num_words.toString();
+        this.wordsEnd = [];
+        for (var i = 0; i < num_string.length; i++) {
+          let num = this.add.sprite(deviceWidth * (190 / iphoneWidth) + i * deviceWidth * (20 / iphoneWidth), deviceHeight * (580 / iphoneHeight), num_string[i] + "_w");
+          num.setScale(scaleFactor * 0.8);
+          num.setOrigin(0, 0.5);
+          this.wordsEnd.push(num);
+        }
+
+        console.log(num_string)
 
         let point_str = points.toString();
         if (point_str.length < 4) {
@@ -510,45 +527,42 @@ class Anagrams extends SimpleScene {
             point_str = "0000";
           }
         }
-        this.pointsEnd = this.add.text(deviceWidth * (250 / iphoneWidth), deviceHeight * (620 / iphoneHeight), point_str);
-        this.pointsEnd.setOrigin(0, 0.5);
-        this.pointsEnd.setFontSize(deviceHeight * (50 / iphoneHeight));
-        this.pointsEnd.y -= Math.sqrt(text_offset) * 50;
-        this.pointsEnd.setFontColor(0x00000);
-        this.pointsEnd.setFontFamily("Arial Black");
+        this.pointsEnd = [];
+        for (var i = 0; i < point_str.length; i++) {
+          let num = this.add.sprite(deviceWidth * (240 / iphoneWidth) + i * deviceWidth * (25 / iphoneWidth), deviceHeight * (620 / iphoneHeight), point_str[i] + "_w");
+          num.setScale(scaleFactor);
+          num.setOrigin(0, 0.5);
+          this.pointsEnd.push(num);
+        }
 
         words.sort((a, b) => b.length - a.length);
         this.blanks = [];
         this.blank_words = [];
         this.point_vals = [];
         for (var i = 0; i < num_words; i++) {
-         let blank = this.add.sprite(deviceWidth * ((145 - ((6 - words[i].length) * 10)) / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), "blank");
+         
+          let blank = this.add.sprite(deviceWidth * ((145 - ((6 - words[i].length) * 10)) / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), "blank");
           blank.setOrigin(0.5, 0.5);
           blank.scaleY = scaleFactor;
           blank.scaleX = scaleFactor - (6 - words[i].length) * 0.12 * scaleFactor;
           this.blanks.push(blank);
-
+          
           let tempWord = words[i].toUpperCase();
-          let blank_word = this.add.text(deviceWidth * (70 / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), tempWord);
-          blank_word.setOrigin(0, 0.5);
-          blank_word.setFontSize(deviceHeight * (35 / iphoneHeight));
-          blank_word.y -= text_offset * 35;
-          blank_word.setFontColor(0x00000);
-          blank_word.setFontFamily("Arial");
-          blank_word.setFontStyle("bold");
-          this.blank_words.push(blank_word);
-
-          let disp_val = this.add.text(deviceWidth * (430 / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), point_val[words[i].length - 3]);
-          disp_val.setOrigin(1, 0.5);
-          disp_val.setFontSize(deviceHeight * (35 / iphoneHeight));
-          disp_val.y -= text_offset * 35;
-          disp_val.setFontColor(0xffffff);
-          disp_val.setFontFamily("Arial");
-          disp_val.setFontStyle("bold");
-          this.point_vals.push(disp_val);
+          for (var j = 0; j < tempWord.length; j++) {
+            let blank_letter = this.add.sprite(deviceWidth * (66 / iphoneWidth) + j * deviceWidth * (26 / iphoneWidth), deviceHeight * ((705 + i * 55) / iphoneHeight), tempWord[j] + "_f");
+            blank_letter.setOrigin(0, 0.5);
+            blank_letter.setScale(scaleFactor);
+            this.blank_words.push(blank_letter);
+          }
+          
+          let dispVal = point_val[words[i].length - 3].toString();
+          for (var j = 0; j < dispVal.length; j++) {
+            let blank_val = this.add.sprite(deviceWidth * (435 / iphoneWidth) - j * deviceWidth * (21 / iphoneWidth), deviceHeight * ((705 + i * 55) / iphoneHeight), dispVal[dispVal.length - j - 1] + "_f");
+            blank_val.setOrigin(1, 0.5);
+            blank_val.setScale(scaleFactor);
+            this.point_vals.push(blank_val);
+          }
         }
-
-      }, 200);
 
       gameScreen = 2;
     }
