@@ -155,7 +155,7 @@ function editLetters() {
 
   inputs.forEach((input, index) => {
     input.addEventListener("input", () => {
-      if (languages != 'japanese' && languages != 'french') {
+      if (languages != 'jp' && languages != 'fr') {
         input.value = input.value.split('').map(char => alphabet.includes(char.toUpperCase()) ? char : '').join('');
       } else if (alphabet.includes(input.value.toUpperCase().substring(0,1))) {
         inputs[index + 1].value = input.value.substring(1);
@@ -163,7 +163,7 @@ function editLetters() {
         input.value = input.value.substring(0,1);
       }
 
-      if (languages != 'japanese' && languages != 'french' && input.value.length >= 1 && input.value != '´') {
+      if (languages != 'jp' && languages != 'fr' && input.value.length >= 1 && input.value != '´') {
         input.value = input.value.substring(0,1);
         if (index < inputs.length - 1) {
           inputs[index + 1].focus();
@@ -189,6 +189,7 @@ function editLetters() {
 }
 
 function generateLetters() {
+  if (num_letters > 0) {
   fetch(`anagrams/${languages}.json`)
     .then((response) => {
       if (!response.ok) {
@@ -197,7 +198,6 @@ function generateLetters() {
       return response.json();
     })
     .then((data) => {
-      // Access the array of six-letter words
       const words = data[num_letters];
       const word = words[Math.floor(Math.random() * words.length)];
 
@@ -215,6 +215,7 @@ function generateLetters() {
       }
     })
     .catch((error) => console.error("Error loading JSON:", error));
+  }
 }
 
 function checkDict() {
@@ -225,7 +226,7 @@ function checkDict() {
       inputs.forEach((input) => {
         input.value = input.value.split('').map(char => alphabet.includes(char.toUpperCase()) ? char : '').join('');
       });
-      languages = document.getElementsByClassName("language")[i].innerHTML.toLowerCase();
+      languages = document.getElementsByClassName("language")[i].value;
       document.getElementById("dictionary").innerHTML = "";
       for (var j = 0; j < dictionaries[i].length; j++) {
         document.getElementById("dictionary").innerHTML +=
