@@ -114,7 +114,7 @@ class Anagrams extends SimpleScene {
     this.letterButtons = [];
     for (var i = 0; i < num_letters; i++){
       let button = this.add.sprite(6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1592 / iphoneHeight), "letter");
-        button.scale = scaleFactor * 6/denominator;
+      button.scale = scaleFactor * 6/denominator;
       button.setOrigin(0.5, 0.5);
       this.letterButtons.push(button);
     }
@@ -122,7 +122,7 @@ class Anagrams extends SimpleScene {
     this.letterShadows = [];
     for (var i = 0; i < num_letters; i++) {
       let letter = this.add.sprite(6/denominator * (deviceWidth * (86 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1595 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])] + "_in");
-        letter.scale = scaleFactor * 6/denominator;
+      letter.scale = scaleFactor * 6/denominator;
       letter.setOrigin(0.5, 0.5);
       this.letterShadows.push(letter);
     }
@@ -130,7 +130,7 @@ class Anagrams extends SimpleScene {
     this.letters = [];
     for (var i = 0; i < num_letters; i++) {
       let letter = this.add.sprite(6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1592 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])]);
-        letter.scale = scaleFactor * 6/denominator;
+      letter.scale = scaleFactor * 6/denominator;
       letter.setOrigin(0.5, 0.5);
       this.letters.push(letter)
     }
@@ -138,7 +138,7 @@ class Anagrams extends SimpleScene {
     this.letterCovers = [];
     for (var i = 0; i < num_letters; i++) {
       let cover = this.add.rectangle(6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1592 / iphoneHeight), 6/denominator * (deviceWidth * (130 / iphoneWidth)), 6/denominator * (deviceHeight * (130 / iphoneHeight)), 0xffffff);
-       cover.setAlpha(0.01);
+      cover.setAlpha(0.01);
       cover.enableClick();
       this.letterCovers.push(cover);
     }
@@ -211,7 +211,7 @@ class Anagrams extends SimpleScene {
   }
 
   update() {
-    if (setup == false) {
+    if (!setup) {
       this.input.keyboard.on('keydown', (event) => {
         if (event.key == 'Enter' && gameScreen == 0) {
           this.startGame();
@@ -229,12 +229,12 @@ class Anagrams extends SimpleScene {
           keydown = true;
           if (letter_stage[event.key.toUpperCase()] == 0) {
             this.moveLetter(curr_inputs.indexOf(event.key.toUpperCase()));
-            if (curr_inputs.includes(event.key.toUpperCase()) == false) {
+            if (!curr_inputs.includes(event.key.toUpperCase())) {
               letter_stage[event.key.toUpperCase()] = 1;
             }
           } else {
             this.moveLetter(letter_chosen[letter_chain.indexOf(event.key.toUpperCase())]);
-            if (letter_chain.includes(event.key.toUpperCase()) == false) {
+            if (!letter_chain.includes(event.key.toUpperCase())) {
               letter_stage[event.key.toUpperCase()] = 0;
             }
           }
@@ -379,7 +379,7 @@ class Anagrams extends SimpleScene {
   enterWord () {
     let input_word = letter_chain.join("").toLowerCase();
 
-    if (filteredArray.includes(input_word) && words.includes(input_word) == false) {
+    if (filteredArray.includes(input_word) && !words.includes(input_word)) {
 
       words.push(input_word);
       num_words += 1;
@@ -398,7 +398,7 @@ class Anagrams extends SimpleScene {
 
       this.wordView(input_word, "+" + point_val[input_word.length - 3], 'white');
 
-    } else if (filteredArray.includes(input_word) == false) {
+    } else if (!filteredArray.includes(input_word)) {
 
       this.wordView(input_word, "Not in the vocabulary", 'red');
 
@@ -434,13 +434,13 @@ class Anagrams extends SimpleScene {
       document.getElementsByClassName("floating-text")[chain.length - 1].style.color = '#eda9b0';
     }
     setTimeout(() => {
-      document.getElementsByClassName("floating-text")[chain.length - 1].style.bottom = '220px';
+      document.getElementsByClassName("floating-text")[chain.length - 1].style.bottom = '30vh';
       document.getElementsByClassName("floating-text")[chain.length - 1].style.opacity = '0';
     }, 1);
   }
 
     moveLetter(i) {
-      if (letter_chosen.includes(i) == false) {
+      if (!letter_chosen.includes(i)) {
           letter_chain.push(letter_inputs[i]);
           curr_inputs[i] = '';
           this.pauseAll();
@@ -518,8 +518,6 @@ class Anagrams extends SimpleScene {
           this.wordsEnd.push(num);
         }
 
-        console.log(num_string)
-
         let point_str = points.toString();
         if (point_str.length < 4) {
           point_str = "0" + point_str;
@@ -586,7 +584,7 @@ function updateCountdown() {
   }
   let str_time = str_min + ":" + str_sec;
 
-  if (countdownSec == 5 && sound == 1) {
+  if (countdownMin == 0 && countdownSec == 5 && sound == 1) {
     this.tiktik.play();
   }
 

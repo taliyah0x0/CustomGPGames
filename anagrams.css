@@ -69,9 +69,34 @@ input[type="radio"]:disabled {
 
 .floating-text {
   position: absolute;
-  bottom: 140px;
-  font-size: 16px;
+  bottom: 20vh;
+  font-size: 2.2vh;
   color: white;
   font-weight: bold;
-  transition: 1.5s ease;
+  transition: 2s ease;
+}
+
+.wh-floating-text {
+  position: absolute;
+  top: 35.25vh;
+  font-size: 2.2vh;
+  color: black;
+  font-weight: bold;
+}
+
+.floating-temp {
+  position: absolute;
+  font-size: 14px;
+  color: black;
+  font-weight: bold;
+  left: 28px;
+}
+
+.floating-point {
+  position: absolute;
+  font-size: 14px;
+  color: white;
+  right: 215px;
+  font-weight: bold;
+  text-align: right;
 }
