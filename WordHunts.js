@@ -1,18 +1,17 @@
 let letter_chain = [];
 let word_chosen = "";
+let prev_word = "";
 let words = [];
 let num_words = 0;
 let points = 0;
 let set_limit = 0;
 let point_val = [100, 400, 1200, 2000, 3000];
-let setup = false;
-let keydown = false;
 let gameScreen = 0;
 
 class WordHunts extends SimpleScene {
 
   constructor() {
-    super("WordHunt");
+    super("WordHunts");
   }
 
   init() {
@@ -26,8 +25,10 @@ class WordHunts extends SimpleScene {
     this.load.image("end", "images/whend.png");
     this.load.image("fill", "images/letterfill.png");
     this.load.image("chain", "images/whchain.png");
+    this.load.image("blank", "images/wordblank.png");
+    this.load.image("endButton", "images/endbutton.png");
 
-    for (var i = 0; i < 26; i++) {
+    for (var i = 0; i < alphabet.length; i++) {
       this.load.image(alphabet[i], `${languages}-letters/regular/` + alphabet[i] + ".png");
       this.load.image(alphabet[i] + "_in", `${languages}-letters/inverted/` + alphabet[i] + ".png");
       this.load.image(alphabet[i] + "_f", `${languages}-letters/final/` + alphabet[i] + ".png");
@@ -44,6 +45,11 @@ class WordHunts extends SimpleScene {
     this.load.audio("music", "audio/whmusic.mp3")
     this.load.audio("begin", "audio/begin.mp3");
     this.load.audio("tiktik", "audio/tiktik.mp3");
+    this.load.audio("complete", "audio/complete.mp3");
+    this.load.audio("select", "audio/whselect.mp3");
+    this.load.audio("deselect", "audio/whdeselect.mp3");
+    this.load.audio("pop", "audio/whpop.mp3");
+
     for (var i = 0; i < 4; i++) {
       this.load.audio(`${i + 3}letter`, `audio/${i + 3}letter.mp3`);
     }
@@ -51,11 +57,14 @@ class WordHunts extends SimpleScene {
 
   create() {
     this.music = this.sound.add("music", {loop: true});
-    if (music == 1) {
-      this.music.play();
-    }
+    if (music) this.music.play();
     this.begin = this.sound.add("begin", {loop: false});
     this.tiktik = this.sound.add("tiktik", {loop: true});
+    this.complete = this.sound.add("complete", {loop: false});
+    this.select = this.sound.add("select", {loop: false});
+    this.deselect = this.sound.add("deselect", {loop: false});
+    this.pop = this.sound.add("pop", {loop: false});
+
     this.valid = [];
     for (var i = 0; i < 4; i++) {
       let valid_word = this.sound.add(`${i + 3}letter`, {loop: false});
@@ -81,7 +90,7 @@ class WordHunts extends SimpleScene {
 
     this.chain = this.add.sprite(deviceWidth * 0.5, deviceHeight * (900 / iphoneHeight), "chain");
     this.chain.scale = scaleFactor;
-    this.chain.scaleX = 0.08;
+    this.chain.scaleX = 0.02;
     this.chain.setOrigin(0.5, 0.5);
     this.chain.setAlpha(0);
 
@@ -96,7 +105,7 @@ class WordHunts extends SimpleScene {
     this.letterShadows = [];
     for (var i = 0; i < 16; i++) {
       let letter = this.add.sprite((deviceWidth * (223 / iphoneWidth) + (i % 4) * deviceWidth * (178 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (880 / iphoneHeight) + Math.floor(i / 4) * deviceHeight * (178 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])] + "_in");
-        letter.scale = scaleFactor;
+      letter.scale = scaleFactor;
       letter.setOrigin(0.5, 0.5);
       this.letterShadows.push(letter);
     }
@@ -111,7 +120,6 @@ class WordHunts extends SimpleScene {
 
     this.letterCovers = [];
     for (var i = 0; i < 16; i++) {
-      //let cover = this.add.rectangle((deviceWidth * (221 / iphoneWidth) + (i % 4) * deviceWidth * (178 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (878 / iphoneHeight) + Math.floor(i / 4) * deviceHeight * (178 / iphoneHeight), (deviceWidth * (120 / iphoneWidth)), (deviceHeight * (120 / iphoneHeight)), 0xffffff);
       let cover = this.add.circle((deviceWidth * (221 / iphoneWidth) + (i % 4) * deviceWidth * (178 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (878 / iphoneHeight) + Math.floor(i / 4) * deviceHeight * (178 / iphoneHeight), (deviceWidth * (70 / iphoneWidth)), 0xffffff);
       cover.setAlpha(0.01);
       cover.enableClick();
@@ -129,6 +137,7 @@ class WordHunts extends SimpleScene {
       }
       for (var i = 0; i < 16; i++) {
         if (this.letterFills[i].alpha == 0.9) {
+          if (sound) this.deselect.play();
           this.tweens.add({
             targets: this.letterFills[i],
             alpha: 0.01,
@@ -185,7 +194,7 @@ class WordHunts extends SimpleScene {
       this.timer.push(time)
     }
 
-    if (no_start == 1) {
+    if (no_start) {
       gameScreen = 1;
       this.time.addEvent({
           delay: 1000,
@@ -195,13 +204,31 @@ class WordHunts extends SimpleScene {
       });
     }
 
+    this.endButton = this.add.sprite(deviceWidth * (775 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (275 / iphoneHeight), "endButton");
+    this.endButton.setScale(scaleFactor);
+    this.endButton.enableClick();
+
+    if (!timer) {
+      for (let i = 0; i < this.timer.length; i++) {
+        this.timer[i].setAlpha(0);
+      }
+    } else {
+      this.endButton.setAlpha(0);
+    }
   }
 
   update() {
-    if (gameScreen == 1) {
+    if (gameScreen) {
       for (var i = 0; i < 16; i++) {
         if (this.letterCovers[i].isClicked()) {
-          if (!letter_chain.includes(i)) {
+          let p = letter_chain[letter_chain.length - 1];
+          if (!letter_chain.includes(i) // not been selected previously
+          && (letter_chain.length == 0 // first letter
+          || (i == p + 4 // same column down one
+          || i == p - 4 // same column up one
+          || (!(p % 4 == 0) && (i == p - 1 || i == p - 5 || i == p + 3)) // left diaganols and left, avoid leftmost edge case
+          || (!(p % 4 == 3) && (i == p + 1 || i == p + 5 || i == p - 3)) // right diaganols and right, avoid rightmost edge case
+          ))) {
               this.chain.setTint(0xffffff);
               this.line.clear();
               this.line.lineStyle(deviceWidth * (22 / iphoneWidth), 0xff0000, 0.5);
@@ -209,8 +236,9 @@ class WordHunts extends SimpleScene {
               this.line.setAlpha(0.5);
               this.letterFills[i].setAlpha(0.9);
               this.chain.setAlpha(1);
-              this.chain.scaleX *= 1.17;
+              this.chain.scaleX += 0.035;
               letter_chain.push(i);
+              prev_word = word_chosen;
               word_chosen += letter_inputs[i];
               document.getElementsByClassName("wh-floating-text")[0].innerHTML = word_chosen;
               this.checkWord();
@@ -225,19 +253,22 @@ class WordHunts extends SimpleScene {
               }
               this.line.strokePath();
             }
-          } else if (letter_chain.includes(i) && i != letter_chain[letter_chain.length - 1]) {
+          } /*else if (letter_chain.includes(i)) {
             this.line.clear();
             this.line.lineStyle(deviceWidth * (22 / iphoneWidth), 0xff0000, 0.5);
             this.line.lineCap = 'round';
             this.line.setAlpha(0.5);
-            for (var j = letter_chain.length - 1; j > letter_chain.indexOf(i); j--) {
-              this.letterFills[letter_chain[j]].setAlpha(0.01);
-              this.chain.scaleX *= 0.85;
-              word_chosen = word_chosen.substring(0, word_chosen.length - 1);
-              document.getElementsByClassName("wh-floating-text")[0].innerHTML = word_chosen;
-              this.chain.setTint(0xffffff);
-              this.checkWord();
-              letter_chain.pop();
+            if (i != letter_chain[letter_chain.length - 1]) {
+              for (var j = letter_chain.length - 1; j > letter_chain.indexOf(i); j--) {
+                this.letterFills[letter_chain[j]].setAlpha(0.01);
+                prev_word = word_chosen;
+                word_chosen = word_chosen.substring(0, word_chosen.length - 1);
+                document.getElementsByClassName("wh-floating-text")[0].innerHTML = word_chosen;
+                this.chain.setTint(0xffffff);
+                this.chain.scaleX -= 0.035;
+                this.checkWord();
+                letter_chain.pop();
+              }
             }
             this.line.beginPath();
             this.line.moveTo(this.letterCovers[letter_chain[0]].x, this.letterCovers[letter_chain[0]].y);
@@ -245,7 +276,7 @@ class WordHunts extends SimpleScene {
               this.line.lineTo(this.letterCovers[letter_chain[k]].x, this.letterCovers[letter_chain[k]].y);
             }
             this.line.strokePath();
-          }
+          }*/
         }
       }
     }
@@ -253,19 +284,33 @@ class WordHunts extends SimpleScene {
     if (this.startButton.wasClicked()) {
       this.startGame();
     }
-
+    if (this.endButton.wasClicked()) {
+      this.endGame();
+    }
   }
 
   checkWord () {
     let input_word = word_chosen.toLowerCase();
+    prev_word = prev_word.toLowerCase();
     if (filteredArray.includes(input_word) && !words.includes(input_word)) {
-      for (var i = 0; i < 6; i++) {
-        this.chain.scaleX *= 1.17;
+      if (sound) this.pop.play();
+      if (!(filteredArray.includes(prev_word) && !words.includes(prev_word))) {
+        for (var i = 0; i < 6; i++) {
+          this.chain.scaleX += 0.04;
+        }
       }
       document.getElementsByClassName("wh-floating-text")[0].innerHTML += ` (+${point_val[word_chosen.length - 3]})`
       this.chain.setTint(0xa8fc98);
-    } else if (words.includes(input_word)) {
+    } else if (filteredArray.includes(input_word) && words.includes(input_word)) {
       this.chain.setTint(0xedea88);
+      if (sound) this.select.play();
+    } else {
+      if (sound) this.select.play();
+    }
+    if (filteredArray.includes(prev_word) && !words.includes(prev_word)){
+      for (var i = 0; i < 6; i++) {
+        this.chain.scaleX -= 0.04;
+      }
     }
   }
 
@@ -283,18 +328,14 @@ class WordHunts extends SimpleScene {
           loop: true
       });
 
-      if (sound == 1) {
-        this.valid[input_word.length - 3].play();
-      }
+      if (sound) this.valid[input_word.length - 3].play();
     }
   }
 
   startGame() {
     gameScreen = 1;
     this.startButton.setAlpha(0);
-    if (sound == 1) {
-      this.begin.play();
-    }
+    if (sound) this.begin.play();
     this.addTween(this.startScreen, -deviceWidth * 0.5, this.startScreen.y, 200);
     this.addTween(this.gameScreen, deviceWidth * 0.5, this.gameScreen.y, 200);
     this.words.forEach(sprite => {
@@ -306,6 +347,7 @@ class WordHunts extends SimpleScene {
     this.timer.forEach(sprite => {
       this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
     });
+    this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 200);
 
     for (var i = 0; i < 16; i++) {
       this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 200);
@@ -321,6 +363,98 @@ class WordHunts extends SimpleScene {
     });
   }
 
+  endGame () {
+    if (sound) {
+      this.tiktik.stop();
+      this.complete.play();
+    }
+
+    this.addTween(this.gameScreen, -1.5 * deviceWidth, this.gameScreen.y, 200);
+
+    this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 200);
+
+    this.words.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+    });
+    this.points.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+    });
+    this.timer.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+    });
+    this.letterCovers.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+    });
+    this.letterFills.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+    });
+    this.letterShadows.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+    });
+    this.letters.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+    });
+
+    this.addTween(this.endScreen, 0.5 * deviceWidth, this.endScreen.y, 200);
+
+    gameScreen = 2;
+
+    setTimeout(() => {
+    let num_string = num_words.toString();
+      this.wordsEnd = [];
+      for (var i = 0; i < num_string.length; i++) {
+        let num = this.add.sprite(deviceWidth * (190 / iphoneWidth) + i * deviceWidth * (20 / iphoneWidth), deviceHeight * (580 / iphoneHeight), num_string[i] + "_w");
+        num.setScale(scaleFactor * 0.8);
+        num.setOrigin(0, 0.5);
+        this.wordsEnd.push(num);
+      }
+
+      let point_str = points.toString();
+      if (point_str.length < 4) {
+        point_str = "0" + point_str;
+        if (points == 0) {
+          point_str = "0000";
+        }
+      }
+      this.pointsEnd = [];
+      for (var i = 0; i < point_str.length; i++) {
+        let num = this.add.sprite(deviceWidth * (240 / iphoneWidth) + i * deviceWidth * (25 / iphoneWidth), deviceHeight * (620 / iphoneHeight), point_str[i] + "_w");
+        num.setScale(scaleFactor);
+        num.setOrigin(0, 0.5);
+        this.pointsEnd.push(num);
+      }
+
+      words.sort((a, b) => b.length - a.length);
+      this.blanks = [];
+      this.blank_words = [];
+      this.point_vals = [];
+      for (var i = 0; i < num_words; i++) {
+       
+        let blank = this.add.sprite(deviceWidth * ((145 - ((6 - words[i].length) * 10)) / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), "blank");
+        blank.setOrigin(0.5, 0.5);
+        blank.scaleY = scaleFactor;
+        blank.scaleX = scaleFactor - (6 - words[i].length) * 0.12 * scaleFactor;
+        this.blanks.push(blank);
+        
+        let tempWord = words[i].toUpperCase();
+        for (var j = 0; j < tempWord.length; j++) {
+          let blank_letter = this.add.sprite(deviceWidth * (66 / iphoneWidth) + j * deviceWidth * (26 / iphoneWidth), deviceHeight * ((705 + i * 55) / iphoneHeight), tempWord[j] + "_f");
+          blank_letter.setOrigin(0, 0.5);
+          blank_letter.setScale(scaleFactor);
+          this.blank_words.push(blank_letter);
+        }
+        
+        let dispVal = point_val[words[i].length - 3].toString();
+        for (var j = 0; j < dispVal.length; j++) {
+          let blank_val = this.add.sprite(deviceWidth * (435 / iphoneWidth) - j * deviceWidth * (21 / iphoneWidth), deviceHeight * ((705 + i * 55) / iphoneHeight), dispVal[dispVal.length - j - 1] + "_f");
+          blank_val.setOrigin(1, 0.5);
+          blank_val.setScale(scaleFactor);
+          this.point_vals.push(blank_val);
+        }
+      }
+    }, 200);
+  }
+
   addTween(target, x, y, duration) {
     this.tweens.add({
       targets: target,
@@ -333,7 +467,7 @@ class WordHunts extends SimpleScene {
 }
 
 function updateCountdown() {
-  if (timer == 1) {
+  if (timer) {
     countdownSec--;
   if (countdownSec == -1 && countdownMin >= 1) {
     countdownMin -= 1;
@@ -350,13 +484,13 @@ function updateCountdown() {
   }
   let str_time = str_min + ":" + str_sec;
 
-  if (countdownMin == 0 && countdownSec == 5 && sound == 1) {
+  if (countdownMin == 0 && countdownSec == 5 && sound) {
     this.tiktik.play();
   }
 
     if (countdownSec == -1 && countdownMin == 0 && countdownSec != -10) {
       this.time.removeAllEvents();  // Stop the countdown
-      const scene = game.scene.keys.Anagrams;
+      const scene = game.scene.keys.WordHunts;
       scene.endGame();
       countdownSec = -10;
     } else {

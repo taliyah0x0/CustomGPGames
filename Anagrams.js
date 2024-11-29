@@ -6,7 +6,6 @@ let points = 0;
 let set_limit = 0;
 let point_val = [100, 400, 1200, 2000, 3000];
 let setup = false;
-let keydown = false;
 let gameScreen = 0;
 let denominator;
 let letter_stage = {};
@@ -31,7 +30,7 @@ class Anagrams extends SimpleScene {
     this.load.image("blank", "images/wordblank.png");
     this.load.image("endButton", "images/endbutton.png");
 
-    for (var i = 0; i < 26; i++) {
+    for (var i = 0; i < alphabet.length; i++) {
       this.load.image(alphabet[i], `${languages}-letters/regular/` + alphabet[i] + ".png");
       this.load.image(alphabet[i] + "_in", `${languages}-letters/inverted/` + alphabet[i] + ".png");
       this.load.image(alphabet[i] + "_f", `${languages}-letters/final/` + alphabet[i] + ".png");
@@ -82,9 +81,7 @@ class Anagrams extends SimpleScene {
     this.complete = this.sound.add("complete", {loop: false});
     this.shuffle = this.sound.add("shuffle", {loop: false});
     this.music = this.sound.add("music", {loop: true});
-    if (music == 1) {
-      this.music.play();
-    }
+    if (music) this.music.play();
 
     this.startScreen = this.add.sprite(deviceWidth * 0.5 + no_start * -deviceWidth, deviceHeight * (907 / iphoneHeight), "start");
     this.startScreen.scale = scaleFactor;
@@ -185,7 +182,7 @@ class Anagrams extends SimpleScene {
       this.timer.push(time)
     }
 
-    if (no_start == 1) {
+    if (no_start) {
       gameScreen = 1;
       this.time.addEvent({
           delay: 1000,
@@ -199,8 +196,10 @@ class Anagrams extends SimpleScene {
     this.endButton.setScale(scaleFactor);
     this.endButton.enableClick();
 
-    if (timer == 0) {
-      this.timer.setAlpha(0);
+    if (!timer) {
+      for (let i = 0; i < this.timer.length; i++) {
+        this.timer[i].setAlpha(0);
+      }
     } else {
       this.endButton.setAlpha(0);
     }
@@ -217,16 +216,15 @@ class Anagrams extends SimpleScene {
           this.startGame();
         }
 
-        if (event.key == 'Enter' && letter_chain.length >= 3 && gameScreen == 1) {
+        if (event.key == 'Enter' && letter_chain.length >= 3 && gameScreen) {
           this.enterWord();
         }
 
-        if (event.key == 'Backspace' && letter_chain.length > 0 && gameScreen == 1) {
+        if (event.key == 'Backspace' && letter_chain.length > 0 && gameScreen) {
           this.moveLetter(letter_chosen[letter_chosen.length - 1]);
         }
 
-        if (event.key.length === 1 && event.key.match(/[a-z]/i) && gameScreen == 1 && letter_inputs.includes(event.key.toUpperCase())) {
-          keydown = true;
+        if (event.key.length === 1 && alphabet.includes(event.key.toUpperCase()) && gameScreen && letter_inputs.includes(event.key.toUpperCase())) {
           if (letter_stage[event.key.toUpperCase()] == 0) {
             this.moveLetter(curr_inputs.indexOf(event.key.toUpperCase()));
             if (!curr_inputs.includes(event.key.toUpperCase())) {
@@ -244,13 +242,9 @@ class Anagrams extends SimpleScene {
     }
 
 
-    if (this.startButton.wasClicked()) {
-      this.startGame();
-    }
+    if (this.startButton.wasClicked()) this.startGame();
 
-    if (this.endButton.wasClicked()) {
-      this.endGame();
-    }
+    if (this.endButton.wasClicked()) this.endGame();
 
     for (var i = 0; i < num_letters; i++) {
       if (this.letterCovers[i].wasClicked()) {
@@ -258,7 +252,7 @@ class Anagrams extends SimpleScene {
       }
     }
 
-    if (letter_chain.length >= 3 && gameScreen == 1) {
+    if (letter_chain.length >= 3 && gameScreen) {
       this.enterButton.setAlpha(1);
       this.enter.setAlpha(0.01);
     } else {
@@ -266,14 +260,10 @@ class Anagrams extends SimpleScene {
       this.enter.setAlpha(0);
     }
 
-    if (this.enter.wasClicked()) {
-    this.enterWord();
-    }
+    if (this.enter.wasClicked()) this.enterWord();
 
     if (this.shuffleButton.wasClicked()) {
-      if (sound == 1) {
-        this.shuffle.play();
-      }
+      if (sound) this.shuffle.play();
 
       let shuffledArray = [];
       for (var i = 0; i < num_letters; i++) {
@@ -321,9 +311,7 @@ class Anagrams extends SimpleScene {
   startGame() {
     gameScreen = 1;
     this.startButton.setAlpha(0);
-    if (sound == 1) {
-      this.begin.play();
-    }
+    if (sound) this.begin.play();
     this.addTween(this.startScreen, -deviceWidth * 0.5, this.startScreen.y, 200);
     this.addTween(this.gameScreen, deviceWidth * 0.5, this.gameScreen.y, 200);
     this.addTween(this.enterButton, deviceWidth * 0.5, this.enterButton.y, 200);
@@ -392,9 +380,7 @@ class Anagrams extends SimpleScene {
           loop: true
       });
 
-      if (sound == 1) {
-      this.valid[input_word.length - 3].play();
-      }
+      if (sound) this.valid[input_word.length - 3].play();
 
       this.wordView(input_word, "+" + point_val[input_word.length - 3], 'white');
 
@@ -402,17 +388,13 @@ class Anagrams extends SimpleScene {
 
       this.wordView(input_word, "Not in the vocabulary", 'red');
 
-      if (sound == 1) {
-      this.wrong.play();
-      }
+      if (sound) this.wrong.play();
 
     } else if (words.includes(input_word)) {
 
       this.wordView(input_word, "Already used", 'red');
 
-      if (sound == 1) {
-      this.wrong.play();
-      }
+      if (sound) this.wrong.play();
 
     }
 
@@ -439,61 +421,59 @@ class Anagrams extends SimpleScene {
     }, 1);
   }
 
-    moveLetter(i) {
-      if (!letter_chosen.includes(i)) {
-          letter_chain.push(letter_inputs[i]);
-          curr_inputs[i] = '';
-          this.pauseAll();
+  moveLetter(i) {
+    if (!letter_chosen.includes(i)) {
+        letter_chain.push(letter_inputs[i]);
+        curr_inputs[i] = '';
+        this.pauseAll();
 
-          if (sound == 1) {
-            this.select.play();
-          }
-
-          this.addTween(this.letterButtons[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
-          this.addTween(this.letterShadows[i], 6/denominator * (deviceWidth * (86 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1442 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
-          this.addTween(this.letters[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
-          this.addTween(this.letterCovers[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
-
-          letter_chosen.push(i);
-
-        } else {
-          letter_chain.splice(letter_chosen.indexOf(i), 1);
-          curr_inputs[i] = letter_inputs[i];
-          this.pauseAll();
-
-          if (sound == 1) {
-          this.deselect.play();
-          }
-
-          this.addTween(this.letterButtons[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
-          this.addTween(this.letterShadows[i],  6/denominator * (deviceWidth * (86 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1595 / iphoneHeight), 100);
-          this.addTween(this.letters[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
-          this.addTween(this.letterCovers[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
-
-          for (var j = letter_chosen.indexOf(i) + 1; j < letter_chosen.length; j++) {
-            this.addTween(this.letterButtons[letter_chosen[j]], this.letterButtons[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterButtons[letter_chosen[j]].y, 100);
-            this.addTween(this.letterShadows[letter_chosen[j]], this.letterShadows[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterShadows[letter_chosen[j]].y, 100);
-            this.addTween(this.letters[letter_chosen[j]], this.letters[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letters[letter_chosen[j]].y, 100);
-            this.addTween(this.letterCovers[letter_chosen[j]], this.letterCovers[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterCovers[letter_chosen[j]].y, 100);
-          }
-          letter_chosen.splice(letter_chosen.indexOf(i), 1);
+        if (sound) {
+          this.select.play();
         }
+
+        this.addTween(this.letterButtons[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
+        this.addTween(this.letterShadows[i], 6/denominator * (deviceWidth * (86 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1442 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
+        this.addTween(this.letters[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
+        this.addTween(this.letterCovers[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
+
+        letter_chosen.push(i);
+
+      } else {
+        letter_chain.splice(letter_chosen.indexOf(i), 1);
+        curr_inputs[i] = letter_inputs[i];
+        this.pauseAll();
+
+        if (sound) this.deselect.play();
+
+        this.addTween(this.letterButtons[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
+        this.addTween(this.letterShadows[i],  6/denominator * (deviceWidth * (86 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1595 / iphoneHeight), 100);
+        this.addTween(this.letters[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
+        this.addTween(this.letterCovers[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
+
+        for (var j = letter_chosen.indexOf(i) + 1; j < letter_chosen.length; j++) {
+          this.addTween(this.letterButtons[letter_chosen[j]], this.letterButtons[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterButtons[letter_chosen[j]].y, 100);
+          this.addTween(this.letterShadows[letter_chosen[j]], this.letterShadows[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterShadows[letter_chosen[j]].y, 100);
+          this.addTween(this.letters[letter_chosen[j]], this.letters[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letters[letter_chosen[j]].y, 100);
+          this.addTween(this.letterCovers[letter_chosen[j]], this.letterCovers[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterCovers[letter_chosen[j]].y, 100);
+        }
+        letter_chosen.splice(letter_chosen.indexOf(i), 1);
       }
+    }
 
     endGame () {
-      if (sound == 1) {
+      if (sound) {
         this.tiktik.stop();
         this.complete.play();
       }
 
-        this.addTween(this.gameScreen, -1.5 * deviceWidth, this.gameScreen.y, 200);
-        for (var i = 0; i < num_letters; i++) {
-          this.addTween(this.letterButtons[i], this.letterButtons[i].x - deviceWidth, this.letterButtons[i].y, 200);
-          this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 200);
-          this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 200);
-          this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 200);
-          this.addTween(this.dishes[i], this.dishes[i].x - deviceWidth, this.dishes[i].y, 200);
-        }
+      this.addTween(this.gameScreen, -1.5 * deviceWidth, this.gameScreen.y, 200);
+      for (var i = 0; i < num_letters; i++) {
+        this.addTween(this.letterButtons[i], this.letterButtons[i].x - deviceWidth, this.letterButtons[i].y, 200);
+        this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 200);
+        this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 200);
+        this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 200);
+        this.addTween(this.dishes[i], this.dishes[i].x - deviceWidth, this.dishes[i].y, 200);
+      }
 
       this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 200);
 
@@ -509,6 +489,9 @@ class Anagrams extends SimpleScene {
 
       this.addTween(this.endScreen, 0.5 * deviceWidth, this.endScreen.y, 200);
 
+      gameScreen = 2;
+
+      setTimeout(() => {
       let num_string = num_words.toString();
         this.wordsEnd = [];
         for (var i = 0; i < num_string.length; i++) {
@@ -561,13 +544,12 @@ class Anagrams extends SimpleScene {
             this.point_vals.push(blank_val);
           }
         }
-
-      gameScreen = 2;
+      }, 200);
     }
 }
 
 function updateCountdown() {
-  if (timer == 1) {
+  if (timer) {
     countdownSec--;
   if (countdownSec == -1 && countdownMin >= 1) {
     countdownMin -= 1;
@@ -584,7 +566,7 @@ function updateCountdown() {
   }
   let str_time = str_min + ":" + str_sec;
 
-  if (countdownMin == 0 && countdownSec == 5 && sound == 1) {
+  if (countdownMin == 0 && countdownSec == 5 && sound) {
     this.tiktik.play();
   }
 

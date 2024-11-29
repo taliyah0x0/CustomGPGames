@@ -21,7 +21,6 @@ let huntconfig = {
 let game_start = false;
 let game;
 let letter_inputs = [];
-//let letter_inputs = ['A', 'B', 'A', 'T', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
 let no_start = 0;
 let timer = 1;
 let music = 1;
@@ -33,31 +32,40 @@ let dict = dictionaries[0][0];
 
 function startHuntGame() {
   game_start = true;
-  dict = dictionaries[0][0];
+  
+  let language_ind;
+  let langs = document.getElementsByClassName("language");
+  for (var i = 0; i < langs.length; i++) {
+    if (langs[i].selected == true) {
+      language_ind = i;
+    }
+  }
+
+  let dict_ind;
+  let dicts = document.getElementsByClassName("dict");
+  for (var i = 0; i < dicts.length; i++) {
+    if (dicts[i].selected == true) {
+      dict_ind = i;
+    }
+  }
+
+  dict = dictionaries[language_ind][dict_ind];
 
   for (var i = 0; i < 16; i++) {
     let letter_value = document.getElementsByClassName("letter")[i].value;
     letter_inputs.push(letter_value.toUpperCase());
   }
 
-  if (document.getElementById("start_screen").checked == false) {
-    no_start = 1;
-  }
+  if (!document.getElementById("start_screen").checked) no_start = 1;
 
-  if (document.getElementById("timer").checked == false) {
-    timer = 0;
-  }
+  if (!document.getElementById("timer").checked) timer = 0;
 
   countdownMin = parseInt(document.getElementById("min").value, 10);
   countdownSec = parseInt(document.getElementById("sec").value, 10) - 1;
 
-  if (document.getElementById("music").checked == false) {
-    music = 0;
-  }
+  if (!document.getElementById("music").checked) music = 0;
 
-  if (document.getElementById("sound").checked == false) {
-    sound = 0;
-  }
+  if (!document.getElementById("sound").checked) sound = 0;
 
   fetch(`dictionaries/${dict}.json`)
     .then((response) => {
@@ -69,7 +77,6 @@ function startHuntGame() {
     .then((data) => {
       // Combine all arrays into a single array
       const combinedArray = Object.values(data).flat();
-      console.log(combinedArray.length)
       filteredArray = combinedArray.filter((word) => word.length >= 3);
     })
     .catch((error) => console.error("Error loading JSON:", error));
@@ -77,13 +84,6 @@ function startHuntGame() {
   document.getElementsByTagName("body")[0].innerHTML = `<div class="wh-floating-text"></div>`;
   game = new Phaser.Game(huntconfig);
 }
-
-const TOTAL_LETTERS = 16;
-let dictionary;
-// More vowels to increase their chances of appearing
-const alphabet_i = "AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUUVWXYZ".split("");
-const vowels = "AEIOU".split("");
-let letters = [];
 
 function makeLetterBoxes() {
   const letter_c = document.getElementById("letters");
@@ -133,6 +133,103 @@ function makeLetterBoxes() {
   });
 }
 
+function checkDict() {
+  for (var i = 0; i < document.getElementsByClassName("language").length; i++) {
+    if (document.getElementsByClassName("language")[i].selected == true) {
+      alphabet = alphabets[i];
+      const inputs = document.querySelectorAll(".letter");
+      inputs.forEach((input) => {
+        input.value = input.value.split('').map(char => alphabet.includes(char.toUpperCase()) ? char : '').join('');
+      });
+      languages = document.getElementsByClassName("language")[i].value;
+      document.getElementById("dictionary").innerHTML = "";
+      for (var j = 0; j < dictionaries[i].length; j++) {
+        document.getElementById("dictionary").innerHTML +=
+          `<option value="" class="dict"></option>`
+          document.getElementsByClassName("dict")[j].innerHTML = dictionary_names[i][j];
+          document.getElementsByClassName("dict")[j].value = dictionary_names[i][j];
+      }
+    }
+  }
+  document.getElementsByClassName("dict")[0].selected = true;
+}
+
+function checkTime(index) {
+  let time = document.getElementsByClassName("time")[index].value;
+  time = parseInt(time, 10);
+  if (isNaN(time)) {
+    time = 0;
+  }
+  if (time < 10) {
+    document.getElementsByClassName("time")[index].value =
+      "0" + time.toString();
+  }
+  if (
+    document.getElementsByClassName("time")[0].value == "00" &&
+    document.getElementsByClassName("time")[1].value == "00"
+  ) {
+    document.getElementsByClassName("time")[1].value = "01";
+  }
+}
+
+function disableTime() {
+  let option = document.getElementById("timer").checked;
+  if (!option) {
+    document.getElementsByClassName("time")[0].disabled = true;
+    document.getElementsByClassName("time")[1].disabled = true;
+  } else {
+    document.getElementsByClassName("time")[0].disabled = false;
+    document.getElementsByClassName("time")[1].disabled = false;
+  }
+}
+
+function generateBoard() {
+  let language = 0;
+  for (var i = 0; i < document.getElementsByClassName("language").length; i++) {
+    if (document.getElementsByClassName("language")[i].selected == true) {
+      language = i;
+    }
+  }
+  let board = [];
+  for (let i = 0; i < 16; i++) {
+    board.push(alphabet[0]);
+    let random = Math.random() * letter_freq_sum[language][letter_freq_sum[language].length - 1];
+    for (let j = 1; j < letter_freq_sum[language].length; j++) {
+      if (random < letter_freq_sum[language][j] && random >= letter_freq_sum[language][j - 1]) {
+        board[i] = alphabet[j];
+      }
+    }
+  }
+  for(let i = 0; i < board.length; i++) {
+    document.getElementsByClassName("letter")[i].value = board[i];
+  }
+
+  // Using GamePigeon generated Wordhunt Boards
+  /*fetch(`./wordhunts/${languages}.txt`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+    })
+    .then(data => {
+      let lines = data.split('\n');
+      let chosen_line = lines[Math.floor(Math.random() * 50)];
+      let board = chosen_line.toUpperCase().split("");
+      for(let i = 0; i < board.length; i++) {
+        document.getElementsByClassName("letter")[i].value = board[i];
+      }
+    })*/
+}
+
+// VIET'S CODE BELOW
+/*const TOTAL_LETTERS = 16;
+let dictionary;
+// More vowels to increase their chances of appearing
+const alphabet_i = "AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUUVWXYZ".split("");
+const vowels = "AEIOU".split("");
+let letters = [];
+
 function fillMatrixWithLetters(board) {
     for(let i = 0; i < board.length; i++) {
       document.getElementsByClassName("letter")[i].value = board[i];
@@ -155,32 +252,6 @@ function generateLetters(num_letters = TOTAL_LETTERS) {
 async function generateBoard(num_letters = TOTAL_LETTERS) {
   let board = await generateOptimalBoards();
   fillMatrixWithLetters(board);
-}
-
-function checkTime(index) {
-  let time = document.getElementsByClassName("time")[index].value;
-  time = parseInt(time, 10);
-  if (time < 10) {
-    document.getElementsByClassName("time")[index].value =
-      "0" + time.toString();
-  }
-  if (
-    document.getElementsByClassName("time")[0].value == "00" &&
-    document.getElementsByClassName("time")[1].value == "00"
-  ) {
-    document.getElementsByClassName("time")[1].value = "01";
-  }
-}
-
-function disableTime() {
-  let option = document.getElementById("timer").checked;
-  if (option == false) {
-    document.getElementsByClassName("time")[0].disabled = true;
-    document.getElementsByClassName("time")[1].disabled = true;
-  } else {
-    document.getElementsByClassName("time")[0].disabled = false;
-    document.getElementsByClassName("time")[1].disabled = false;
-  }
 }
 
 async function generateOptimalBoards(tries = 5) {
@@ -349,4 +420,4 @@ async function prep() {
 
 document.addEventListener("DOMContentLoaded", function() {
   prep();
-});
+});*/

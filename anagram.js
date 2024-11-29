@@ -39,24 +39,16 @@ function startGame() {
   }
   curr_inputs = letter_inputs.slice();
 
-  if (document.getElementById("start_screen").checked == false) {
-    no_start = 1;
-  }
+  if (!document.getElementById("start_screen").checked) no_start = 1;
 
-  if (document.getElementById("timer").checked == false) {
-    timer = 0;
-  }
+  if (!document.getElementById("timer").checked) timer = 0;
 
   countdownMin = parseInt(document.getElementById("min").value, 10);
   countdownSec = parseInt(document.getElementById("sec").value, 10) - 1;
 
-  if (document.getElementById("music").checked == false) {
-    music = 0;
-  }
+  if (!document.getElementById("music").checked) music = 0;
 
-  if (document.getElementById("sound").checked == false) {
-    sound = 0;
-  }
+  if (!document.getElementById("sound").checked) sound = 0;
 
   let language_ind;
   let langs = document.getElementsByClassName("language");
@@ -86,7 +78,6 @@ function startGame() {
     .then((data) => {
       // Combine all arrays into a single array
       const combinedArray = Object.values(data).flat();
-      console.log(combinedArray.length)
       filteredArray = combinedArray.filter((word) => word.length <= 9);
     })
     .catch((error) => console.error("Error loading JSON:", error));
@@ -98,6 +89,9 @@ function startGame() {
 function checkTime(index) {
   let time = document.getElementsByClassName("time")[index].value;
   time = parseInt(time, 10);
+  if (isNaN(time)) {
+    time = 0;
+  }
   if (time < 10) {
     document.getElementsByClassName("time")[index].value =
       "0" + time.toString();
@@ -112,7 +106,7 @@ function checkTime(index) {
 
 function disableTime() {
   let option = document.getElementById("timer").checked;
-  if (option == false) {
+  if (!option) {
     document.getElementsByClassName("time")[0].disabled = true;
     document.getElementsByClassName("time")[1].disabled = true;
   } else {
@@ -126,7 +120,7 @@ function editLetters() {
   document.getElementById("form").style.width = deviceWidth + "px";
   document.getElementById("form").style.padding = "0 10px 0 10px";
   let option = document.getElementById("custom").checked;
-  if (option == false) {
+  if (!option) {
     document.getElementById("custom_letter").disabled = true;
     document.getElementById("custom_letter").classList.remove("text-gray-900");
     document.getElementById("custom_letter").classList.add("text-gray-400");
@@ -188,34 +182,82 @@ function editLetters() {
   
 }
 
-function generateLetters() {
-  if (num_letters > 0) {
-  fetch(`anagrams/${languages}.json`)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      const words = data[num_letters];
-      const word = words[Math.floor(Math.random() * words.length)];
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+      // Generate a random index between 0 and i
+      const randomIndex = Math.floor(Math.random() * (i + 1));
 
-      let shuffledLetters = word.split("");
-      for (let i = shuffledLetters.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [shuffledLetters[i], shuffledLetters[j]] = [
-          shuffledLetters[j],
-          shuffledLetters[i],
-        ];
-      }
-
-      for (var i = 0; i < num_letters; i++) {
-        document.getElementsByClassName("letter")[i].value = shuffledLetters[i];
-      }
-    })
-    .catch((error) => console.error("Error loading JSON:", error));
+      // Swap the current element with the random index
+      [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
   }
+  return array;
+}
+
+function generateLetters() {
+  let language = 0;
+  for (var i = 0; i < document.getElementsByClassName("language").length; i++) {
+    if (document.getElementsByClassName("language")[i].selected == true) {
+      language = i;
+    }
+  }
+  let board = [];
+  for (let i = 0; i < num_letters; i++) {
+    board.push(alphabet[0]);
+    let random = Math.random() * letter_freq_sum[language][letter_freq_sum[language].length - 1];
+    for (let j = 1; j < letter_freq_sum[language].length; j++) {
+      if (random < letter_freq_sum[language][j] && random >= letter_freq_sum[language][j - 1]) {
+        board[i] = alphabet[j];
+      }
+    }
+  }
+  for(let i = 0; i < board.length; i++) {
+    document.getElementsByClassName("letter")[i].value = board[i];
+  }
+  
+  // Using GamePigeon generated Anagrams boards
+  /*if (num_letters == 6 && languages != 'jp') {
+    fetch(`./anagrams/${languages}.txt`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.text();
+    })
+    .then(data => {
+      let lines = data.split('\n');
+      let chosen_line = lines[Math.floor(Math.random() * 4)];
+      let board = chosen_line.toUpperCase().split("");
+      board = shuffleArray(board);
+      for (var i = 0; i < num_letters; i++) {
+        document.getElementsByClassName("letter")[i].value = board[i];
+      }
+    })
+  } else if (num_letters >= 1 && num_letters <= 9) {
+    fetch(`anagrams/${languages}.json`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const words = data[num_letters];
+        const word = words[Math.floor(Math.random() * words.length)];
+
+        let shuffledLetters = word.split("");
+        for (let i = shuffledLetters.length - 1; i > 0; i--) {
+          let j = Math.floor(Math.random() * (i + 1));
+          [shuffledLetters[i], shuffledLetters[j]] = [
+            shuffledLetters[j],
+            shuffledLetters[i],
+          ];
+        }
+
+        for (var i = 0; i < num_letters; i++) {
+          document.getElementsByClassName("letter")[i].value = shuffledLetters[i];
+        }
+      })
+  }*/
 }
 
 function checkDict() {
@@ -230,8 +272,9 @@ function checkDict() {
       document.getElementById("dictionary").innerHTML = "";
       for (var j = 0; j < dictionaries[i].length; j++) {
         document.getElementById("dictionary").innerHTML +=
-          `<option value="Collins 2021" class="dict"></option>`
+          `<option value="" class="dict"></option>`
           document.getElementsByClassName("dict")[j].innerHTML = dictionary_names[i][j];
+          document.getElementsByClassName("dict")[j].value = dictionary_names[i][j];
       }
     }
   }

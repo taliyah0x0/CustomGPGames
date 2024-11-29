@@ -14,7 +14,7 @@
       <link rel="stylesheet" href="anagrams.css">
       <meta name="viewport" content="width=device-width, initial-scale=1">
    </head>
-   <body>
+   <body onload="makeLetterBoxes()">
       <div style="font-family:'Arial Black'; position:absolute; left:-1000px; visibility:hidden;">.</div>
       <div style="font-family:'Arial'; font-weight: bold; position:absolute; left:-1000px; visibility:hidden;">.</div>
       <div style="font-family:'Arial'; position:absolute; left:-1000px; visibility:hidden;">.</div>
@@ -27,9 +27,9 @@
                     <legend class="text-sm font-semibold text-gray-900">Language</legend>
                     <select title="languages" id="dropdown" name="dropdown" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2 select" onchange="checkDict()">
                         <option value="en" class="language" selected>English</option>
-                        <option disabled value="sp" class="language">Spanish</option>
-                      <option disabled value="fr" class="language">French</option>
-                      <option disabled value="jp" class="language">Japanese</option>
+                        <option value="sp" class="language">Spanish</option>
+                      <option value="fr" class="language">French</option>
+                      <option value="jp" class="language">Japanese</option>
                         <option disabled value="cn" class="language">Mandarin</option>
                       <option disabled value="kr" class="language">Korean</option>
                     </select>
@@ -39,9 +39,10 @@
               <fieldset>
                   <div class="mt-4">
                     <legend class="text-sm font-semibold text-gray-900">Dictionary</legend>
-                    <select id="dictionary" title="dictionary" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2 select" onchange="checkDict()">
+                    <select id="dictionary" title="dictionary" class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mt-2 select">
                      <option value="Collins 2021" class="dict" selected>Collins 2021</option>
-                     <option disabled value="Collins 2015" class="dict">Collins 2015</option>
+                     <option value="Collins 2019" class="dict">Collins 2019</option>
+                     <option value="Collins 2015" class="dict">Collins 2015</option>
                  </select>
                   </div>
                </fieldset>
