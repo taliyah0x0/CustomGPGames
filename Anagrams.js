@@ -31,10 +31,9 @@ class Anagrams extends SimpleScene {
     this.load.image("endButton", "images/endbutton.png");
 
     for (var i = 0; i < alphabet.length; i++) {
-      console.log(alphabet[i])
-      this.load.image(alphabet[i], `${languages}-letters/regular-copy/` + encodeURIComponent(alphabet[i]) + ".png");
-      this.load.image(alphabet[i] + "_in", `${languages}-letters/inverted-copy/` + encodeURIComponent(alphabet[i]) + ".png");
-      this.load.image(alphabet[i] + "_f", `${languages}-letters/final-copy/` + encodeURIComponent(alphabet[i]) + ".png");
+      this.load.image(alphabet[i], `${languages}-letters/regular-copy/` + i + ".png");
+      this.load.image(alphabet[i] + "_in", `${languages}-letters/inverted-copy/` + i + ".png");
+      this.load.image(alphabet[i] + "_f", `${languages}-letters/final-copy/` + i + ".png");
     }
 
     for (var i = 0; i < 10; i++) {
