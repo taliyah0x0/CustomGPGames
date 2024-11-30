@@ -294,10 +294,8 @@ class WordHunts extends SimpleScene {
     prev_word = prev_word.toLowerCase();
     if (filteredArray.includes(input_word) && !words.includes(input_word)) {
       if (sound) this.pop.play();
-      if (!(filteredArray.includes(prev_word) && !words.includes(prev_word))) {
-        for (var i = 0; i < 6; i++) {
-          this.chain.scaleX += 0.04;
-        }
+      for (var i = 0; i < 6; i++) {
+        this.chain.scaleX += 0.04;
       }
       document.getElementsByClassName("wh-floating-text")[0].innerHTML += ` (+${point_val[word_chosen.length - 3]})`
       this.chain.setTint(0xa8fc98);
