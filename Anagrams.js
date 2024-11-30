@@ -31,9 +31,10 @@ class Anagrams extends SimpleScene {
     this.load.image("endButton", "images/endbutton.png");
 
     for (var i = 0; i < alphabet.length; i++) {
-      this.load.image(alphabet[i], `${languages}-letters/regular/` + alphabet[i] + ".png");
-      this.load.image(alphabet[i] + "_in", `${languages}-letters/inverted/` + alphabet[i] + ".png");
-      this.load.image(alphabet[i] + "_f", `${languages}-letters/final/` + alphabet[i] + ".png");
+      console.log(alphabet[i])
+      this.load.image(alphabet[i], `${languages}-letters/regular-copy/` + encodeURIComponent(alphabet[i]) + ".png");
+      this.load.image(alphabet[i] + "_in", `${languages}-letters/inverted-copy/` + encodeURIComponent(alphabet[i]) + ".png");
+      this.load.image(alphabet[i] + "_f", `${languages}-letters/final-copy/` + encodeURIComponent(alphabet[i]) + ".png");
     }
 
     for (var i = 0; i < 10; i++) {
@@ -312,30 +313,30 @@ class Anagrams extends SimpleScene {
     gameScreen = 1;
     this.startButton.setAlpha(0);
     if (sound) this.begin.play();
-    this.addTween(this.startScreen, -deviceWidth * 0.5, this.startScreen.y, 200);
-    this.addTween(this.gameScreen, deviceWidth * 0.5, this.gameScreen.y, 200);
-    this.addTween(this.enterButton, deviceWidth * 0.5, this.enterButton.y, 200);
-    this.addTween(this.enter, deviceWidth * 0.5, this.enter.y, 200);
+    this.addTween(this.startScreen, -deviceWidth * 0.5, this.startScreen.y, 100);
+    this.addTween(this.gameScreen, deviceWidth * 0.5, this.gameScreen.y, 100);
+    this.addTween(this.enterButton, deviceWidth * 0.5, this.enterButton.y, 100);
+    this.addTween(this.enter, deviceWidth * 0.5, this.enter.y, 100);
 
     this.words.forEach(sprite => {
-      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
     });
     this.points.forEach(sprite => {
-      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
     });
     this.timer.forEach(sprite => {
-      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
     });
 
-    this.addTween(this.shuffleButton, this.shuffleButton.x - deviceWidth, this.shuffleButton.y, 200);
-    this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 200);
+    this.addTween(this.shuffleButton, this.shuffleButton.x - deviceWidth, this.shuffleButton.y, 100);
+    this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 100);
 
     for (var i = 0; i < num_letters; i++) {
-      this.addTween(this.dishes[i], this.dishes[i].x - deviceWidth, this.dishes[i].y, 200);
-      this.addTween(this.letterButtons[i], this.letterButtons[i].x - deviceWidth, this.letterButtons[i].y, 200);
-      this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 200);
-      this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 200);
-      this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 200);
+      this.addTween(this.dishes[i], this.dishes[i].x - deviceWidth, this.dishes[i].y, 100);
+      this.addTween(this.letterButtons[i], this.letterButtons[i].x - deviceWidth, this.letterButtons[i].y, 100);
+      this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 100);
+      this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 100);
+      this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 100);
     }
     this.time.addEvent({
         delay: 1000,
@@ -466,28 +467,28 @@ class Anagrams extends SimpleScene {
         this.complete.play();
       }
 
-      this.addTween(this.gameScreen, -1.5 * deviceWidth, this.gameScreen.y, 200);
+      this.addTween(this.gameScreen, -1.5 * deviceWidth, this.gameScreen.y, 100);
       for (var i = 0; i < num_letters; i++) {
-        this.addTween(this.letterButtons[i], this.letterButtons[i].x - deviceWidth, this.letterButtons[i].y, 200);
-        this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 200);
-        this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 200);
-        this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 200);
-        this.addTween(this.dishes[i], this.dishes[i].x - deviceWidth, this.dishes[i].y, 200);
+        this.addTween(this.letterButtons[i], this.letterButtons[i].x - deviceWidth, this.letterButtons[i].y, 100);
+        this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 100);
+        this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 100);
+        this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 100);
+        this.addTween(this.dishes[i], this.dishes[i].x - deviceWidth, this.dishes[i].y, 100);
       }
 
-      this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 200);
+      this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 100);
 
       this.words.forEach(sprite => {
-        this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+        this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
       });
       this.points.forEach(sprite => {
-        this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+        this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
       });
       this.timer.forEach(sprite => {
-        this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+        this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
       });
 
-      this.addTween(this.endScreen, 0.5 * deviceWidth, this.endScreen.y, 200);
+      this.addTween(this.endScreen, 0.5 * deviceWidth, this.endScreen.y, 100);
 
       gameScreen = 2;
 
@@ -544,7 +545,7 @@ class Anagrams extends SimpleScene {
             this.point_vals.push(blank_val);
           }
         }
-      }, 200);
+      }, 100);
     }
 }
 
