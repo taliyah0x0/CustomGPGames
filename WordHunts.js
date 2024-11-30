@@ -90,7 +90,7 @@ class WordHunts extends SimpleScene {
 
     this.chain = this.add.sprite(deviceWidth * 0.5, deviceHeight * (900 / iphoneHeight), "chain");
     this.chain.scale = scaleFactor;
-    this.chain.scaleX = 0.02;
+    this.chain.scaleX = deviceWidth * (0.08 / iphoneWidth);
     this.chain.setOrigin(0.5, 0.5);
     this.chain.setAlpha(0);
 
@@ -154,7 +154,7 @@ class WordHunts extends SimpleScene {
         ease: 'Linear', 
       });
       setTimeout (() => {
-        this.chain.scaleX = 0.08;
+        this.chain.scaleX = deviceWidth * (0.08 / iphoneWidth);
         this.chain.setTint(0xffffff);
       }, 200);
       letter_chain = [];
@@ -236,7 +236,7 @@ class WordHunts extends SimpleScene {
               this.line.setAlpha(0.5);
               this.letterFills[i].setAlpha(0.9);
               this.chain.setAlpha(1);
-              this.chain.scaleX += 0.035;
+              this.chain.scaleX += deviceWidth * (0.06 / iphoneWidth);
               letter_chain.push(i);
               prev_word = word_chosen;
               word_chosen += letter_inputs[i];
@@ -295,7 +295,7 @@ class WordHunts extends SimpleScene {
     if (filteredArray.includes(input_word) && !words.includes(input_word)) {
       if (sound) this.pop.play();
       for (var i = 0; i < 6; i++) {
-        this.chain.scaleX += 0.04;
+        this.chain.scaleX += deviceWidth * (0.06 / iphoneWidth);
       }
       document.getElementsByClassName("wh-floating-text")[0].innerHTML += ` (+${point_val[word_chosen.length - 3]})`
       this.chain.setTint(0xa8fc98);
@@ -307,7 +307,7 @@ class WordHunts extends SimpleScene {
     }
     if (filteredArray.includes(prev_word) && !words.includes(prev_word)){
       for (var i = 0; i < 6; i++) {
-        this.chain.scaleX -= 0.04;
+        this.chain.scaleX -= deviceWidth * (0.06 / iphoneWidth);
       }
     }
   }

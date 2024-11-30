@@ -423,42 +423,42 @@ class Anagrams extends SimpleScene {
 
   moveLetter(i) {
     if (!letter_chosen.includes(i)) {
-        letter_chain.push(letter_inputs[i]);
-        curr_inputs[i] = '';
-        this.pauseAll();
+      letter_chain.push(letter_inputs[i]);
+      curr_inputs[i] = '';
+      this.pauseAll();
 
-        if (sound) {
-          this.select.play();
-        }
-
-        this.addTween(this.letterButtons[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
-        this.addTween(this.letterShadows[i], 6/denominator * (deviceWidth * (86 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1442 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
-        this.addTween(this.letters[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
-        this.addTween(this.letterCovers[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
-
-        letter_chosen.push(i);
-
-      } else {
-        letter_chain.splice(letter_chosen.indexOf(i), 1);
-        curr_inputs[i] = letter_inputs[i];
-        this.pauseAll();
-
-        if (sound) this.deselect.play();
-
-        this.addTween(this.letterButtons[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
-        this.addTween(this.letterShadows[i],  6/denominator * (deviceWidth * (86 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1595 / iphoneHeight), 100);
-        this.addTween(this.letters[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
-        this.addTween(this.letterCovers[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
-
-        for (var j = letter_chosen.indexOf(i) + 1; j < letter_chosen.length; j++) {
-          this.addTween(this.letterButtons[letter_chosen[j]], this.letterButtons[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterButtons[letter_chosen[j]].y, 100);
-          this.addTween(this.letterShadows[letter_chosen[j]], this.letterShadows[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterShadows[letter_chosen[j]].y, 100);
-          this.addTween(this.letters[letter_chosen[j]], this.letters[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letters[letter_chosen[j]].y, 100);
-          this.addTween(this.letterCovers[letter_chosen[j]], this.letterCovers[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterCovers[letter_chosen[j]].y, 100);
-        }
-        letter_chosen.splice(letter_chosen.indexOf(i), 1);
+      if (sound) {
+        this.select.play();
       }
+
+      this.addTween(this.letterButtons[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
+      this.addTween(this.letterShadows[i], 6/denominator * (deviceWidth * (86 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1442 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
+      this.addTween(this.letters[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
+      this.addTween(this.letterCovers[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
+
+      letter_chosen.push(i);
+
+    } else {
+      letter_chain.splice(letter_chosen.indexOf(i), 1);
+      curr_inputs[i] = letter_inputs[i];
+      this.pauseAll();
+
+      if (sound) this.deselect.play();
+
+      this.addTween(this.letterButtons[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
+      this.addTween(this.letterShadows[i],  6/denominator * (deviceWidth * (86 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1595 / iphoneHeight), 100);
+      this.addTween(this.letters[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
+      this.addTween(this.letterCovers[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
+
+      for (var j = letter_chosen.indexOf(i) + 1; j < letter_chosen.length; j++) {
+        this.addTween(this.letterButtons[letter_chosen[j]], this.letterButtons[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterButtons[letter_chosen[j]].y, 100);
+        this.addTween(this.letterShadows[letter_chosen[j]], this.letterShadows[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterShadows[letter_chosen[j]].y, 100);
+        this.addTween(this.letters[letter_chosen[j]], this.letters[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letters[letter_chosen[j]].y, 100);
+        this.addTween(this.letterCovers[letter_chosen[j]], this.letterCovers[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterCovers[letter_chosen[j]].y, 100);
+      }
+      letter_chosen.splice(letter_chosen.indexOf(i), 1);
     }
+  }
 
     endGame () {
       if (sound) {
