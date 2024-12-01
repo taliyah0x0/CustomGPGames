@@ -53,17 +53,13 @@ function startGame() {
   let language_ind;
   let langs = document.getElementsByClassName("language");
   for (var i = 0; i < langs.length; i++) {
-    if (langs[i].selected == true) {
-      language_ind = i;
-    }
+    if (langs[i].selected) language_ind = i;
   }
 
   let dict_ind;
   let dicts = document.getElementsByClassName("dict");
   for (var i = 0; i < dicts.length; i++) {
-    if (dicts[i].selected == true) {
-      dict_ind = i;
-    }
+    if (dicts[i].selected) dict_ind = i;
   }
 
   dict = dictionaries[language_ind][dict_ind];
@@ -115,6 +111,11 @@ function disableTime() {
   }
 }
 
+function edit(direction) {
+  document.getElementById("custom_letter").value = parseInt(document.getElementById("custom_letter").value) + parseInt(direction);
+  editLetters();
+}
+
 var num_letters = 6;
 function editLetters() {
   document.getElementById("form").style.width = deviceWidth + "px";
@@ -124,20 +125,25 @@ function editLetters() {
     document.getElementById("custom_letter").disabled = true;
     document.getElementById("custom_letter").classList.remove("text-gray-900");
     document.getElementById("custom_letter").classList.add("text-gray-400");
+    if (document.getElementById("custom-buttons").innerHTML != "") {
+    document.getElementById("custom-buttons").innerHTML = "";
+    }
   } else {
     document.getElementById("custom_letter").disabled = false;
-    num_letters = document.getElementById("custom_letter").value;
+    num_letters = parseInt(document.getElementById("custom_letter").value);
+    if (num_letters > 9) num_letters = 9;
+    if (num_letters < 0) num_letters = 0;
+    document.getElementById("custom_letter").value = num_letters;
     document.getElementById("custom_letter").classList.add("text-gray-900");
     document.getElementById("custom_letter").classList.remove("text-gray-400");
+    if (document.getElementById("custom-buttons").innerHTML == "") {
+    document.getElementById("custom-buttons").innerHTML +=
+    `<p onclick="edit(-1)" class="custom-button ml-2">➖</p><p onclick="edit(1)" class="custom-button ml-2">➕</p>`;
+    }
   }
 
-  if (document.getElementsByClassName("num_letters")[0].checked == true) {
-    num_letters = 6;
-  } else if (
-    document.getElementsByClassName("num_letters")[1].checked == true
-  ) {
-    num_letters = 7;
-  }
+  if (document.getElementsByClassName("num_letters")[0].checked) num_letters = 6;
+  if (document.getElementsByClassName("num_letters")[1].checked) num_letters = 7;
 
   document.getElementById("letters").innerHTML = "";
   for (var i = 0; i < num_letters; i++) {
@@ -193,10 +199,17 @@ function shuffleArray(array) {
   return array;
 }
 
+function clearBoard() {
+  let inputs = document.getElementsByClassName("letter");
+  for (var i = 0; i < inputs.length; i++) {
+    inputs[i].value = "";
+  }
+}
+
 function generateLetters() {
   let language = 0;
   for (var i = 0; i < document.getElementsByClassName("language").length; i++) {
-    if (document.getElementsByClassName("language")[i].selected == true) {
+    if (document.getElementsByClassName("language")[i].selected) {
       language = i;
     }
   }
@@ -262,7 +275,7 @@ function generateLetters() {
 
 function checkDict() {
   for (var i = 0; i < document.getElementsByClassName("language").length; i++) {
-    if (document.getElementsByClassName("language")[i].selected == true) {
+    if (document.getElementsByClassName("language")[i].selected) {
       alphabet = alphabets[i];
       const inputs = document.querySelectorAll(".letter");
       inputs.forEach((input) => {

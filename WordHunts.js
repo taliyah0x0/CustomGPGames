@@ -5,7 +5,6 @@ let words = [];
 let num_words = 0;
 let points = 0;
 let set_limit = 0;
-let point_val = [100, 400, 1200, 2000, 3000];
 let gameScreen = 0;
 
 class WordHunts extends SimpleScene {
@@ -27,6 +26,8 @@ class WordHunts extends SimpleScene {
     this.load.image("chain", "images/whchain.png");
     this.load.image("blank", "images/wordblank.png");
     this.load.image("endButton", "images/endbutton.png");
+    this.load.image("playagain", "images/playagain.png");
+    this.load.image("letter", "images/letter.png");
 
     for (var i = 0; i < alphabet.length; i++) {
       this.load.image(alphabet[i], `${languages}-letters/regular-copy/` + i + ".png");
@@ -94,40 +95,114 @@ class WordHunts extends SimpleScene {
     this.chain.setOrigin(0.5, 0.5);
     this.chain.setAlpha(0);
 
+    this.letterBoards = [];
+    for (var i = 0; i < rows * cols; i++) {
+      let cover = this.add.sprite(deviceWidth * (221 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (878 / iphoneHeight), "letter");
+      if (format > 4) {
+        cover.x -= Math.pow(format / 4, 2) * deviceWidth * (9 / iphoneWidth);
+        cover.y -= Math.pow(format / 4, 2) * deviceHeight * (9 / iphoneHeight);
+        cover.scale = scaleFactor * 1.18 * (4 / format);
+        cover.x += (i % cols) * deviceWidth * (178 / iphoneWidth) * (4 / format);
+        cover.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight) * (4 / format);
+      } else {
+        cover.scale = scaleFactor * 1.18;
+        cover.x += (i % cols) * deviceWidth * (178 / iphoneWidth);
+        cover.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight);
+      }
+      cover.setOrigin(0.5, 0.5);
+      if (letter_inputs[i] == "") {
+        cover.setAlpha(0);
+      }
+      this.letterBoards.push(cover);
+    }
+
     this.letterFills = [];
-    for (var i = 0; i < 16; i++) {
-      let cover = this.add.sprite((deviceWidth * (221 / iphoneWidth) + (i % 4) * deviceWidth * (178 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (878 / iphoneHeight) + Math.floor(i / 4) * deviceHeight * (178 / iphoneHeight), "fill");
-      cover.scale = scaleFactor * 1.1;
-      cover.setAlpha(0.9);
+    for (var i = 0; i < rows * cols; i++) {
+      let cover = this.add.sprite(deviceWidth * (221 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (878 / iphoneHeight), "fill");
+      if (format > 4) {
+        cover.x -= Math.pow(format / 4, 2) * deviceWidth * (9 / iphoneWidth);
+        cover.y -= Math.pow(format / 4, 2) * deviceHeight * (9 / iphoneHeight);
+        cover.scale = scaleFactor * 1.1 * (4 / format);
+        cover.x += (i % cols) * deviceWidth * (178 / iphoneWidth) * (4 / format);
+        cover.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight) * (4 / format);
+      } else {
+        cover.scale = scaleFactor * 1.1;
+        cover.x += (i % cols) * deviceWidth * (178 / iphoneWidth);
+        cover.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight);
+      }
+      if (letter_inputs[i] == "") {
+        cover.setAlpha(0);
+      } else {
+        cover.setAlpha(0.9);
+      }
+      cover.setOrigin(0.5, 0.5);
       this.letterFills.push(cover);
     }
 
     this.letterShadows = [];
-    for (var i = 0; i < 16; i++) {
-      let letter = this.add.sprite((deviceWidth * (223 / iphoneWidth) + (i % 4) * deviceWidth * (178 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (880 / iphoneHeight) + Math.floor(i / 4) * deviceHeight * (178 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])] + "_in");
-      letter.scale = scaleFactor;
+    for (var i = 0; i < rows * cols; i++) {
+      let letter = this.add.sprite(deviceWidth * (223 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (880 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])] + "_in");
+      if (format > 4) {
+        letter.x -= Math.pow(format / 4, 2) * deviceWidth * (9 / iphoneWidth);
+        letter.y -= Math.pow(format / 4, 2) * deviceHeight * (9 / iphoneHeight);
+        letter.scale = scaleFactor * (4 / format);
+        letter.x += (i % cols) * deviceWidth * (178 / iphoneWidth) * (4 / format);
+        letter.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight) * (4 / format);
+      } else {
+        letter.scale = scaleFactor;
+        letter.x += (i % cols) * deviceWidth * (178 / iphoneWidth);
+        letter.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight);
+      }
+      if (letter_inputs[i] == "") {
+        letter.setAlpha(0);
+      }
       letter.setOrigin(0.5, 0.5);
       this.letterShadows.push(letter);
     }
 
     this.letters = [];
-    for (var i = 0; i < 16; i++) {
-      let letter = this.add.sprite((deviceWidth * (221 / iphoneWidth) + (i % 4) * deviceWidth * (178 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (878 / iphoneHeight) + Math.floor(i / 4) * deviceHeight * (178 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])]);
-      letter.scale = scaleFactor;
+    for (var i = 0; i < rows * cols; i++) {
+      let letter = this.add.sprite(deviceWidth * (221 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (878 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])]);
+      if (format > 4) {
+        letter.x -= Math.pow(format / 4, 2) * deviceWidth * (9 / iphoneWidth);
+        letter.y -= Math.pow(format / 4, 2) * deviceHeight * (9 / iphoneHeight);
+        letter.scale = scaleFactor * (4 / format);
+        letter.x += (i % cols) * deviceWidth * (178 / iphoneWidth) * (4 / format);
+        letter.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight) * (4 / format);
+      } else {
+        letter.scale = scaleFactor;
+        letter.x += (i % cols) * deviceWidth * (178 / iphoneWidth);
+        letter.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight);
+      }
+      if (letter_inputs[i] == "") {
+        letter.setAlpha(0);
+      }
       letter.setOrigin(0.5, 0.5);
-      this.letters.push(letter)
+      this.letters.push(letter);
     }
 
     this.letterCovers = [];
-    for (var i = 0; i < 16; i++) {
-      let cover = this.add.circle((deviceWidth * (221 / iphoneWidth) + (i % 4) * deviceWidth * (178 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (878 / iphoneHeight) + Math.floor(i / 4) * deviceHeight * (178 / iphoneHeight), (deviceWidth * (70 / iphoneWidth)), 0xffffff);
+    for (var i = 0; i < rows * cols; i++) {
+      let cover = this.add.circle(deviceWidth * (221 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (878 / iphoneHeight), (deviceWidth * (70 / iphoneWidth)) * (4 / format), 0xffffff);
       cover.setAlpha(0.01);
+      if (format != 4) {
+        cover.x -= Math.pow(format / 4, 2) * deviceWidth * (9 / iphoneWidth);
+        cover.y -= Math.pow(format / 4, 2) * deviceHeight * (9 / iphoneHeight);
+        cover.x += (i % cols) * deviceWidth * (178 / iphoneWidth) * (4 / format);
+        cover.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight) * (4 / format);
+      } else {
+        cover.x += (i % cols) * deviceWidth * (178 / iphoneWidth);
+        cover.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight);
+      }
+      if (letter_inputs[i] == "") {
+        cover.setAlpha(0);
+      }
       cover.enableClick();
       this.letterCovers.push(cover);
     }
 
     this.line = this.add.graphics();
-    this.line.lineStyle(deviceWidth * (22 / iphoneWidth), 0xff0000, 0.5);
+    this.line.lineStyle(deviceWidth * (22 / iphoneWidth) * (4 / format), 0xff0000, 0.5);
     this.line.lineCap = 'round';
     this.line.setAlpha(0.5);
      
@@ -135,7 +210,7 @@ class WordHunts extends SimpleScene {
       if (word_chosen.length >= 3) {
         this.enterWord(word_chosen);
       }
-      for (var i = 0; i < 16; i++) {
+      for (var i = 0; i < rows * cols; i++) {
         if (this.letterFills[i].alpha == 0.9) {
           if (sound) this.deselect.play();
           this.tweens.add({
@@ -215,28 +290,33 @@ class WordHunts extends SimpleScene {
     } else {
       this.endButton.setAlpha(0);
     }
+
+    this.playAgain = this.add.sprite(deviceWidth * 0.5, deviceHeight * (350 / iphoneHeight), "playagain");
+    this.playAgain.setScale(scaleFactor);
+    this.playAgain.enableClick();
+    this.playAgain.setAlpha(0);
   }
 
   update() {
     if (gameScreen) {
-      for (var i = 0; i < 16; i++) {
+      for (var i = 0; i < rows * cols; i++) {
         if (this.letterCovers[i].isClicked()) {
-          let p = letter_chain[letter_chain.length - 1];
+          let p = parseInt(letter_chain[letter_chain.length - 1]);
           if (!letter_chain.includes(i) // not been selected previously
           && (letter_chain.length == 0 // first letter
-          || (i == p + 4 // same column down one
-          || i == p - 4 // same column up one
-          || (!(p % 4 == 0) && (i == p - 1 || i == p - 5 || i == p + 3)) // left diaganols and left, avoid leftmost edge case
-          || (!(p % 4 == 3) && (i == p + 1 || i == p + 5 || i == p - 3)) // right diaganols and right, avoid rightmost edge case
+          || (i == p + cols // same column down one
+          || i == p - cols // same column up one
+          || (!(p % cols == 0) && (i == p - 1 || i == p - cols - 1 || i == p + cols - 1)) // left diaganols and left, avoid leftmost edge case
+          || (!(p % cols == cols - 1) && (i == p + 1 || i == p + cols + 1 || i == p - cols + 1)) // right diaganols and right, avoid rightmost edge case
           ))) {
               this.chain.setTint(0xffffff);
               this.line.clear();
-              this.line.lineStyle(deviceWidth * (22 / iphoneWidth), 0xff0000, 0.5);
+              this.line.lineStyle(deviceWidth * (22 / iphoneWidth) * (4 / format), 0xff0000, 0.5);
               this.line.lineCap = 'round';
               this.line.setAlpha(0.5);
               this.letterFills[i].setAlpha(0.9);
               this.chain.setAlpha(1);
-              this.chain.scaleX += deviceWidth * (0.06 / iphoneWidth);
+              this.chain.scaleX += deviceWidth * (0.063 / iphoneWidth) + (languages == 'jp') * 0.015;
               letter_chain.push(i);
               prev_word = word_chosen;
               word_chosen += letter_inputs[i];
@@ -281,12 +361,9 @@ class WordHunts extends SimpleScene {
       }
     }
 
-    if (this.startButton.wasClicked()) {
-      this.startGame();
-    }
-    if (this.endButton.wasClicked()) {
-      this.endGame();
-    }
+    if (this.startButton.wasClicked()) this.startGame();
+    if (this.endButton.wasClicked()) this.endGame();
+    if (this.playAgain.wasClicked()) window.location.reload();
   }
 
   checkWord () {
@@ -295,9 +372,11 @@ class WordHunts extends SimpleScene {
     if (filteredArray.includes(input_word) && !words.includes(input_word)) {
       if (sound) this.pop.play();
       for (var i = 0; i < 6; i++) {
-        this.chain.scaleX += deviceWidth * (0.06 / iphoneWidth);
+        this.chain.scaleX += deviceWidth * (0.063 / iphoneWidth) + (languages == 'jp') * 0.015;
       }
-      document.getElementsByClassName("wh-floating-text")[0].innerHTML += ` (+${point_val[word_chosen.length - 3]})`
+      let point_val = 100;
+      if (word_chosen.length > 3) point_val = (word_chosen.length - 3) * 400;
+      document.getElementsByClassName("wh-floating-text")[0].innerHTML += ` (+${point_val})`
       this.chain.setTint(0xa8fc98);
     } else if (filteredArray.includes(input_word) && words.includes(input_word)) {
       this.chain.setTint(0xedea88);
@@ -307,7 +386,7 @@ class WordHunts extends SimpleScene {
     }
     if (filteredArray.includes(prev_word) && !words.includes(prev_word)){
       for (var i = 0; i < 6; i++) {
-        this.chain.scaleX -= deviceWidth * (0.06 / iphoneWidth);
+        this.chain.scaleX -= deviceWidth * (0.063 / iphoneWidth) + (languages == 'jp') * 0.015;
       }
     }
   }
@@ -318,7 +397,9 @@ class WordHunts extends SimpleScene {
       words.push(input_word);
       num_words += 1;
       setTextArray(this, this.words, num_words.toString(), "_w");
-      set_limit += point_val[input_word.length - 3];
+      let point_val = 100;
+      if (input_word.length > 3) point_val = (input_word.length - 3) * 400;
+      set_limit += point_val[point_val];
       this.time.addEvent({
           delay: 1,
           callback: updatePoints,
@@ -326,7 +407,9 @@ class WordHunts extends SimpleScene {
           loop: true
       });
 
-      if (sound) this.valid[input_word.length - 3].play();
+      let audio = input_word.length - 3;
+      if (input_word.length > 6) audio = 3;
+      if (sound) this.valid[audio].play();
     }
   }
 
@@ -347,7 +430,8 @@ class WordHunts extends SimpleScene {
     });
     this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 200);
 
-    for (var i = 0; i < 16; i++) {
+    for (var i = 0; i < rows * cols; i++) {
+      this.addTween(this.letterBoards[i], this.letterBoards[i].x - deviceWidth, this.letterBoards[i].y, 200);
       this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 200);
       this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 200);
       this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 200);
@@ -398,7 +482,8 @@ class WordHunts extends SimpleScene {
     gameScreen = 2;
 
     setTimeout(() => {
-    let num_string = num_words.toString();
+      this.playAgain.setAlpha(1);
+      let num_string = num_words.toString();
       this.wordsEnd = [];
       for (var i = 0; i < num_string.length; i++) {
         let num = this.add.sprite(deviceWidth * (190 / iphoneWidth) + i * deviceWidth * (20 / iphoneWidth), deviceHeight * (580 / iphoneHeight), num_string[i] + "_w");
@@ -426,8 +511,13 @@ class WordHunts extends SimpleScene {
       this.blanks = [];
       this.blank_words = [];
       this.point_vals = [];
-      for (var i = 0; i < num_words; i++) {
-       
+      let printout = 15;
+      if (num_words <= printout) {
+        printout = num_words;
+      } else {
+        document.getElementsByClassName("more")[0].innerHTML = "(" + (num_words - 15) + " more)";
+      }
+      for (var i = 0; i < printout; i++) {
         let blank = this.add.sprite(deviceWidth * ((145 - ((6 - words[i].length) * 10)) / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), "blank");
         blank.setOrigin(0.5, 0.5);
         blank.scaleY = scaleFactor;
@@ -442,7 +532,9 @@ class WordHunts extends SimpleScene {
           this.blank_words.push(blank_letter);
         }
         
-        let dispVal = point_val[words[i].length - 3].toString();
+        let point_val = 100;
+        if (words[i].length > 3) point_val = (words[i].length - 3) * 400;
+        let dispVal = point_val.toString();
         for (var j = 0; j < dispVal.length; j++) {
           let blank_val = this.add.sprite(deviceWidth * (435 / iphoneWidth) - j * deviceWidth * (21 / iphoneWidth), deviceHeight * ((705 + i * 55) / iphoneHeight), dispVal[dispVal.length - j - 1] + "_f");
           blank_val.setOrigin(1, 0.5);

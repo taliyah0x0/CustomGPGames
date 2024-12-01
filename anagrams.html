@@ -12,7 +12,7 @@
       <script src="jquery-3.7.1.min.js"></script>
       <script src="https://cdn.tailwindcss.com"></script>
       <link rel="stylesheet" href="input.css">
-      <link rel="stylesheet" href="anagrams.css">
+      <link rel="stylesheet" href="game.css">
       <meta name="viewport" content="width=device-width, initial-scale=1">
    </head>
    <body onload="editLetters()">
@@ -22,7 +22,7 @@
       <form id="form">
          <div >
             <div class="border-b border-gray-900/10 pb-5 mt-5">
-               <h1 class="text-3xl font-semibold leading-7 text-gray-900">Anagrams</h1>
+               <h1 class="text-3xl font-semibold leading-7 text-gray-900"><a href="index.html">⬅︎</a> Anagrams</h1>
                <fieldset class="border-t border-gray-900/10 mt-4">
                   <div class="mt-4">
                     <legend class="text-sm font-semibold text-gray-900">Language</legend>
@@ -51,10 +51,12 @@
                <fieldset class="border-t border-gray-900/10 mt-5">
                   <div class="mt-6">
                      <legend class="text-sm font-semibold text-gray-900">Number of Letters</legend>
-                     <div class="flex items-center gap-x-5 mt-2">
+                     <div class="flex items-center mt-2">
                         <label class="block text-sm font-medium leading-6 text-gray-900 items-center flex gap-x-2 select"><input name="num_letters" onclick="editLetters()" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 num_letters select" checked>6 Letters</label>
-                        <label class="block text-sm font-medium leading-6 text-gray-900 items-center flex gap-x-2 select"><input name="num_letters" onclick="editLetters()" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600 num_letters select">7 Letters</label>
-                        <label class="block text-sm font-medium leading-6 text-gray-900 items-center flex gap-x-2 select"><input name="num_letters" onclick="editLetters()" id="custom" type="radio" class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">Custom:<input type="number" id="custom_letter" onblur="editLetters()" class="w-12 h-10 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center" value="8" disabled min="0" max="9"></label>
+                        <label class="block text-sm font-medium leading-6 text-gray-900 items-center flex gap-x-2 select"><input name="num_letters" onclick="editLetters()" type="radio" class="h-4 w-4 ml-3 border-gray-300 text-indigo-600 focus:ring-indigo-600 num_letters select">7 Letters</label>
+                        <label class="block text-sm font-medium leading-6 text-gray-900 items-center flex gap-x-2 select"><input name="num_letters" onclick="editLetters()" id="custom" type="radio" class="h-4 w-4 ml-3 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+                           Custom:<input type="number" id="custom_letter" onblur="editLetters()" class="w-12 h-10 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center" value="8" disabled min="0" max="9"></label>
+                        <div id="custom-buttons"></div>
                      </div>
                   </div>
                </fieldset>
@@ -66,6 +68,7 @@
                </div>
                <div class="mt-2 flex items-center justify-start gap-x-6">
                   <button type="button" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onclick="generateLetters()">Generate Random</button>
+                  <button type="button" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onclick="clearBoard()">Clear</button>
                </div>
             </div>
             <div class="border-b border-gray-900/10 pb-5">

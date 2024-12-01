@@ -11,7 +11,7 @@
       <script src="jquery-3.7.1.min.js"></script>
       <script src="https://cdn.tailwindcss.com"></script>
       <link rel="stylesheet" href="input.css">
-      <link rel="stylesheet" href="anagrams.css">
+      <link rel="stylesheet" href="game.css">
       <meta name="viewport" content="width=device-width, initial-scale=1">
    </head>
    <body onload="makeLetterBoxes()">
@@ -21,7 +21,7 @@
       <form id="form">
          <div >
             <div class="border-b border-gray-900/10 pb-5 mt-5">
-               <h1 class="text-3xl font-semibold leading-7 text-gray-900">Word Hunt</h1>
+               <h1 class="text-3xl font-semibold leading-7 text-gray-900"><a href="index.html">⬅︎</a> Word Hunt</h1>
                <fieldset class="border-t border-gray-900/10 mt-4">
                   <div class="mt-4">
                     <legend class="text-sm font-semibold text-gray-900">Language</legend>
@@ -50,11 +50,19 @@
                <div class="mt-5 grid grid-cols-1 gap-x-6 gap-y-8">
                   <div class="sm:col-span-2 sm:col-start-1">
                      <label for="city" class="block text-sm font-semibold leading-3 text-gray-900">Letters</label>
+                     <div style="display: flex; flex-direction: row; align-items: center; gap:2px;" class="mt-2">
+                     <p>Rows:</p><p onclick="edit(0,-1)" class="custom-button">➖</p>
+                     <input type="number" value="4" onchange="makeLetterBoxes()" class="w-12 h-9 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center rowcol">
+                     <p onclick="edit(0,1)" class="custom-button">➕</p><p>&nbsp;&nbsp;&nbsp; Columns: </p><p onclick="edit(1,-1)" class="custom-button">➖</p>
+                     <input type="number" value="4" onchange="makeLetterBoxes()" class="w-12 h-9 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center rowcol">
+                     <p onclick="edit(1,1)" class="custom-button">➕</p>
+                     </div>
                      <div class="mt-2" id="letters"></div>
                   </div>
                </div>
                <div class="mt-2 flex items-center justify-start gap-x-6">
                   <button type="button" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onclick="generateBoard()">Generate Random</button>
+                  <button type="button" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600" onclick="clearBoard()">Clear</button>
                </div>
             </div>
             <div class="border-b border-gray-900/10 pb-5">

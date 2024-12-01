@@ -4,7 +4,7 @@ let words = [];
 let num_words = 0;
 let points = 0;
 let set_limit = 0;
-let point_val = [100, 400, 1200, 2000, 3000];
+let point_val = [100, 400, 1200, 2000, 3000, 4000, 5000];
 let setup = false;
 let gameScreen = 0;
 let denominator;
@@ -30,6 +30,7 @@ class Anagrams extends SimpleScene {
     this.load.image("end", "images/end.png");
     this.load.image("blank", "images/wordblank.png");
     this.load.image("endButton", "images/endbutton.png");
+    this.load.image("playagain", "images/playagain.png");
 
     for (var i = 0; i < alphabet.length; i++) {
       this.load.image(alphabet[i], `${languages}-letters/regular-copy/` + i + ".png");
@@ -114,6 +115,9 @@ class Anagrams extends SimpleScene {
       let button = this.add.sprite(6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1592 / iphoneHeight), "letter");
       button.scale = scaleFactor * 6/denominator;
       button.setOrigin(0.5, 0.5);
+      if (letter_inputs[i] == "") {
+        button.setAlpha(0);
+      }
       this.letterButtons.push(button);
     }
 
@@ -122,6 +126,9 @@ class Anagrams extends SimpleScene {
       let letter = this.add.sprite(6/denominator * (deviceWidth * (86 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1595 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])] + "_in");
       letter.scale = scaleFactor * 6/denominator;
       letter.setOrigin(0.5, 0.5);
+      if (letter_inputs[i] == "") {
+        letter.setAlpha(0);
+      }
       this.letterShadows.push(letter);
     }
 
@@ -130,6 +137,9 @@ class Anagrams extends SimpleScene {
       let letter = this.add.sprite(6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1592 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])]);
       letter.scale = scaleFactor * 6/denominator;
       letter.setOrigin(0.5, 0.5);
+      if (letter_inputs[i] == "") {
+        letter.setAlpha(0);
+      }
       this.letters.push(letter)
     }
 
@@ -138,6 +148,9 @@ class Anagrams extends SimpleScene {
       let cover = this.add.rectangle(6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1592 / iphoneHeight), 6/denominator * (deviceWidth * (130 / iphoneWidth)), 6/denominator * (deviceHeight * (130 / iphoneHeight)), 0xffffff);
       cover.setAlpha(0.01);
       cover.enableClick();
+      if (letter_inputs[i] == "") {
+        cover.setAlpha(0);
+      }
       this.letterCovers.push(cover);
     }
 
@@ -208,6 +221,11 @@ class Anagrams extends SimpleScene {
     this.shuffleButton = this.add.rectangle(deviceWidth * (80 / iphoneWidth) + deviceWidth, deviceHeight * (135 / iphoneHeight), deviceWidth * (95 / iphoneWidth), deviceHeight * (95 / iphoneHeight), 0xffffff);
     this.shuffleButton.setAlpha(0.01);
     this.shuffleButton.enableClick();
+
+    this.playAgain = this.add.sprite(deviceWidth * 0.5, deviceHeight * (350 / iphoneHeight), "playagain");
+    this.playAgain.setScale(scaleFactor);
+    this.playAgain.enableClick();
+    this.playAgain.setAlpha(0);
   }
 
   update() {
@@ -242,10 +260,10 @@ class Anagrams extends SimpleScene {
       setup = true;
     }
 
-
+    if (this.enter.wasClicked()) this.enterWord();
     if (this.startButton.wasClicked()) this.startGame();
-
     if (this.endButton.wasClicked()) this.endGame();
+    if (this.playAgain.wasClicked()) window.location.reload();
 
     for (var i = 0; i < num_letters; i++) {
       if (this.letterCovers[i].wasClicked()) {
@@ -260,8 +278,6 @@ class Anagrams extends SimpleScene {
       this.enterButton.setAlpha(0);
       this.enter.setAlpha(0);
     }
-
-    if (this.enter.wasClicked()) this.enterWord();
 
     if (this.shuffleButton.wasClicked()) {
       if (sound) this.shuffle.play();
@@ -288,17 +304,23 @@ class Anagrams extends SimpleScene {
 
       for (let i = 0; i < shuffledArray.length; i++) {
         temp_buttons[shuffledArray[i]] = this.letterButtons[i];
-          temp_letters[shuffledArray[i]] = this.letters[i];
+        temp_letters[shuffledArray[i]] = this.letters[i];
         temp_shadows[shuffledArray[i]] = this.letterShadows[i];
-          temp_covers[shuffledArray[i]] = this.letterCovers[i];
+        temp_covers[shuffledArray[i]] = this.letterCovers[i];
         temp_inputs[shuffledArray[i]] = letter_inputs[i];
       }
 
       for (var i = 0; i < num_letters; i++) {
-        this.addTween(this.letterButtons[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letterButtons[i].y, 100);
-        this.addTween(this.letterShadows[i], 6/denominator * ( deviceWidth * (86 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letterShadows[i].y, 100);
-        this.addTween(this.letters[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letters[i].y, 100);
-        this.addTween(this.letterCovers[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letterCovers[i].y, 100);
+        if (!letter_chain.includes(letter_inputs[i])) {
+          this.addTween(this.letterButtons[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letterButtons[i].y, 100);
+          this.addTween(this.letterShadows[i], 6/denominator * ( deviceWidth * (86 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letterShadows[i].y, 100);
+          this.addTween(this.letters[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letters[i].y, 100);
+          this.addTween(this.letterCovers[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letterCovers[i].y, 100);
+        }
+      }
+
+      for (var i = 0; i < letter_chosen.length; i++) {
+        letter_chosen[i] = shuffledArray[letter_chosen[i]];
       }
 
       this.letterButtons = temp_buttons;
@@ -425,7 +447,6 @@ class Anagrams extends SimpleScene {
   }
 
   moveLetter(i) {
-    console.log(i, letter_inputs[i])
     if (!letter_chosen.includes(i)) {
       this.pauseAll();
 
@@ -495,7 +516,8 @@ class Anagrams extends SimpleScene {
       gameScreen = 2;
 
       setTimeout(() => {
-      let num_string = num_words.toString();
+        this.playAgain.setAlpha(1);
+        let num_string = num_words.toString();
         this.wordsEnd = [];
         for (var i = 0; i < num_string.length; i++) {
           let num = this.add.sprite(deviceWidth * (190 / iphoneWidth) + i * deviceWidth * (20 / iphoneWidth), deviceHeight * (580 / iphoneHeight), num_string[i] + "_w");
@@ -523,8 +545,13 @@ class Anagrams extends SimpleScene {
         this.blanks = [];
         this.blank_words = [];
         this.point_vals = [];
-        for (var i = 0; i < num_words; i++) {
-         
+        let printout = 15;
+        if (num_words <= printout) {
+          printout = num_words;
+        } else {
+        document.getElementsByClassName("more")[0].innerHTML = "(" + (num_words - 15) + " more)";
+        }
+        for (var i = 0; i < printout; i++) {
           let blank = this.add.sprite(deviceWidth * ((145 - ((6 - words[i].length) * 10)) / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), "blank");
           blank.setOrigin(0.5, 0.5);
           blank.scaleY = scaleFactor;

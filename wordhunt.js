@@ -36,22 +36,18 @@ function startHuntGame() {
   let language_ind;
   let langs = document.getElementsByClassName("language");
   for (var i = 0; i < langs.length; i++) {
-    if (langs[i].selected == true) {
-      language_ind = i;
-    }
+    if (langs[i].selected) language_ind = i;
   }
 
   let dict_ind;
   let dicts = document.getElementsByClassName("dict");
   for (var i = 0; i < dicts.length; i++) {
-    if (dicts[i].selected == true) {
-      dict_ind = i;
-    }
+    if (dicts[i].selected) dict_ind = i;
   }
 
   dict = dictionaries[language_ind][dict_ind];
 
-  for (var i = 0; i < 16; i++) {
+  for (var i = 0; i < rows * cols; i++) {
     let letter_value = document.getElementsByClassName("letter")[i].value;
     letter_inputs.push(letter_value.toUpperCase());
   }
@@ -85,17 +81,34 @@ function startHuntGame() {
   game = new Phaser.Game(huntconfig);
 }
 
+let rows = 4;
+let cols = 4;
+let format = rows;
 function makeLetterBoxes() {
-  const letter_c = document.getElementById("letters");
-  letter_c.innerHTML = "";
+  rows = parseInt(document.getElementsByClassName("rowcol")[0].value);
+  cols = parseInt(document.getElementsByClassName("rowcol")[1].value);
+
+  if (rows > 9) rows = 9;
+  if (cols > 9) cols = 9;
+  if (rows < 0) rows = 0;
+  if (cols < 0) cols = 0;
+
+  document.getElementsByClassName("rowcol")[0].value = rows;
+  document.getElementsByClassName("rowcol")[1].value = cols;
+
+  format = rows;
+  if (cols > rows) format = cols;
+
+  const letter = document.getElementById("letters");
+  letter.innerHTML = "";
   let counter = 1;
-  for (let i=0; i < 4; i++) {
-    for (let j=0; j < 4; j++) {
-      letter_c.innerHTML += 
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      letter.innerHTML += 
         `<input type="text" id="${counter}" maxLength="1" class="w-9 h-9 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-center letter uppercase">`;
       counter++;
     }
-    letter_c.innerHTML += `<br>`;
+    letter.innerHTML += `<br>`;
   }
 
   const inputs = document.querySelectorAll(".letter");
@@ -135,7 +148,7 @@ function makeLetterBoxes() {
 
 function checkDict() {
   for (var i = 0; i < document.getElementsByClassName("language").length; i++) {
-    if (document.getElementsByClassName("language")[i].selected == true) {
+    if (document.getElementsByClassName("language")[i].selected) {
       alphabet = alphabets[i];
       const inputs = document.querySelectorAll(".letter");
       inputs.forEach((input) => {
@@ -186,12 +199,10 @@ function disableTime() {
 function generateBoard() {
   let language = 0;
   for (var i = 0; i < document.getElementsByClassName("language").length; i++) {
-    if (document.getElementsByClassName("language")[i].selected == true) {
-      language = i;
-    }
+    if (document.getElementsByClassName("language")[i].selected) language = i;
   }
   let board = [];
-  for (let i = 0; i < 16; i++) {
+  for (let i = 0; i < rows * cols; i++) {
     board.push(alphabet[0]);
     let random = Math.random() * letter_freq_sum[language][letter_freq_sum[language].length - 1];
     for (let j = 1; j < letter_freq_sum[language].length; j++) {
@@ -200,7 +211,7 @@ function generateBoard() {
       }
     }
   }
-  for(let i = 0; i < board.length; i++) {
+  for (let i = 0; i < board.length; i++) {
     document.getElementsByClassName("letter")[i].value = board[i];
   }
 
@@ -220,6 +231,18 @@ function generateBoard() {
         document.getElementsByClassName("letter")[i].value = board[i];
       }
     })*/
+}
+
+function clearBoard() {
+  let inputs = document.getElementsByClassName("letter");
+  for (var i = 0; i < inputs.length; i++) {
+    inputs[i].value = "";
+  }
+}
+
+function edit(type, direction) {
+  document.getElementsByClassName("rowcol")[type].value = parseInt(document.getElementsByClassName("rowcol")[type].value) + parseInt(direction);
+  makeLetterBoxes();
 }
 
 // VIET'S CODE BELOW
