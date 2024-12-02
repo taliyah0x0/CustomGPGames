@@ -372,7 +372,7 @@ class WordHunts extends SimpleScene {
     if (filteredArray.includes(input_word) && !words.includes(input_word)) {
       if (sound) this.pop.play();
       for (var i = 0; i < 6; i++) {
-        this.chain.scaleX += deviceWidth * (0.063 / iphoneWidth) + (languages == 'jp') * 0.015;
+        this.chain.scaleX += deviceWidth * (0.063 / iphoneWidth);
       }
       let point_val = 100;
       if (input_word.length > 3) point_val = (input_word.length - 3) * 400;
@@ -386,7 +386,7 @@ class WordHunts extends SimpleScene {
     }
     if (filteredArray.includes(prev_word) && !words.includes(prev_word)){
       for (var i = 0; i < 6; i++) {
-        this.chain.scaleX -= deviceWidth * (0.063 / iphoneWidth) + (languages == 'jp') * 0.015;
+        this.chain.scaleX -= deviceWidth * (0.063 / iphoneWidth);
       }
     }
   }

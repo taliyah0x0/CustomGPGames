@@ -31,6 +31,7 @@ let filteredArray;
 let dict = dictionaries[0][0];
 
 function startHuntGame() {
+  document.getElementsByTagName("body")[0].style.overflow = "hidden";
   game_start = true;
   
   let language_ind;

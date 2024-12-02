@@ -32,6 +32,7 @@ let filteredArray;
 let dict = dictionaries[0][0];
 
 function startGame() {
+  document.getElementsByTagName("body")[0].style.overflow = "hidden";
   game_start = true;
   for (var i = 0; i < num_letters; i++) {
     let letter_value = document.getElementsByClassName("letter")[i].value;
