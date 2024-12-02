@@ -243,7 +243,7 @@ class Anagrams extends SimpleScene {
           this.moveLetter(letter_chosen[letter_chosen.length - 1]);
         }
 
-        if (event.key.length === 1 && alphabet.includes(event.key.toUpperCase()) && gameScreen && letter_inputs.includes(event.key.toUpperCase()) && pause == false) {
+        if (event.key.length === 1 && alphabet.includes(event.key.toUpperCase()) && gameScreen == 1 && letter_inputs.includes(event.key.toUpperCase()) && !pause) {
           if (letter_stage[event.key.toUpperCase()] == 0) {
             this.moveLetter(curr_inputs.indexOf(event.key.toUpperCase()));
             if (!curr_inputs.includes(event.key.toUpperCase())) {
@@ -447,9 +447,8 @@ class Anagrams extends SimpleScene {
   }
 
   moveLetter(i) {
+    this.pauseAll();
     if (!letter_chosen.includes(i)) {
-      this.pauseAll();
-
       this.addTween(this.letterButtons[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
       this.addTween(this.letterShadows[i], 6/denominator * (deviceWidth * (86 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1442 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
       this.addTween(this.letters[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
@@ -462,8 +461,6 @@ class Anagrams extends SimpleScene {
       letter_chosen.push(i);
 
     } else {
-      this.pauseAll();
-
       this.addTween(this.letterButtons[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
       this.addTween(this.letterShadows[i],  6/denominator * (deviceWidth * (86 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1595 / iphoneHeight), 100);
       this.addTween(this.letters[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
@@ -619,7 +616,7 @@ function updatePoints() {
       points += Phaser.Math.Between(1, (set_limit - points) / 10);
     }
     let point_str = points.toString();
-    if (point_str.length < 4) {
+    while (point_str.length < 4) {
       point_str = "0" + point_str;
     }
     setTextArray(this, this.points, point_str, "_p");

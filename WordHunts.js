@@ -375,7 +375,7 @@ class WordHunts extends SimpleScene {
         this.chain.scaleX += deviceWidth * (0.063 / iphoneWidth) + (languages == 'jp') * 0.015;
       }
       let point_val = 100;
-      if (word_chosen.length > 3) point_val = (word_chosen.length - 3) * 400;
+      if (input_word.length > 3) point_val = (input_word.length - 3) * 400;
       document.getElementsByClassName("wh-floating-text")[0].innerHTML += ` (+${point_val})`
       this.chain.setTint(0xa8fc98);
     } else if (filteredArray.includes(input_word) && words.includes(input_word)) {
@@ -399,7 +399,7 @@ class WordHunts extends SimpleScene {
       setTextArray(this, this.words, num_words.toString(), "_w");
       let point_val = 100;
       if (input_word.length > 3) point_val = (input_word.length - 3) * 400;
-      set_limit += point_val[point_val];
+      set_limit += point_val;
       this.time.addEvent({
           delay: 1,
           callback: updatePoints,
@@ -462,6 +462,9 @@ class WordHunts extends SimpleScene {
       this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
     });
     this.timer.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
+    });
+    this.letterBoards.forEach(sprite => {
       this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 200);
     });
     this.letterCovers.forEach(sprite => {
@@ -617,7 +620,7 @@ function updatePoints() {
       points += Phaser.Math.Between(1, (set_limit - points) / 10);
     }
     let point_str = points.toString();
-    if (point_str.length < 4) {
+    while (point_str.length < 4) {
       point_str = "0" + point_str;
     }
     setTextArray(this, this.points, point_str, "_p");
