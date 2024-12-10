@@ -404,6 +404,17 @@ class Anagrams extends SimpleScene {
           callbackScope: this,
           loop: true
       });
+      setTimeout(() => {
+        points = set_limit;
+        let point_str = points.toString();
+        if (point_str.length < 4) {
+          point_str = "0" + point_str;
+          if (points == 0) {
+            point_str = "0000";
+          }
+        }
+        setTextArray(this, this.points, point_str, "_p");
+      }, 800);
 
       if (sound) this.valid[input_word.length - 3].play();
 
@@ -610,10 +621,11 @@ function updateCountdown() {
 
 function updatePoints() {
   if (points < set_limit) {
-    if (set_limit - points <= 10) {
+    if (set_limit - points <= 5) {
       points = set_limit;
     } else {
-      points += Phaser.Math.Between(1, (set_limit - points) / 10);
+      let val = 2 - Math.floor(Math.random() * (set_limit / 1000));
+      if (val >= 0) points += val;
     }
     let point_str = points.toString();
     while (point_str.length < 4) {

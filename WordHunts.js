@@ -234,7 +234,11 @@ class WordHunts extends SimpleScene {
       }, 200);
       letter_chain = [];
       word_chosen = "";
-      document.getElementsByClassName("wh-floating-text")[0].innerHTML = "";
+      document.getElementsByClassName("wh-floating-text")[0].style.transition = "0.2s ease";
+      document.getElementsByClassName("wh-floating-text")[0].style.opacity = 0;
+      setTimeout (() => {
+        document.getElementsByClassName("wh-floating-text")[0].innerHTML = "";
+      }, 400);
     });
 
     this.words = [];
@@ -320,6 +324,8 @@ class WordHunts extends SimpleScene {
               letter_chain.push(i);
               prev_word = word_chosen;
               word_chosen += letter_inputs[i];
+              document.getElementsByClassName("wh-floating-text")[0].style.transition = "none";
+              document.getElementsByClassName("wh-floating-text")[0].style.opacity = 1;
               document.getElementsByClassName("wh-floating-text")[0].innerHTML = word_chosen;
               this.checkWord();
             if (letter_chain.length == 0) {
@@ -406,6 +412,17 @@ class WordHunts extends SimpleScene {
           callbackScope: this,
           loop: true
       });
+      setTimeout(() => {
+        points = set_limit;
+        let point_str = points.toString();
+        if (point_str.length < 4) {
+          point_str = "0" + point_str;
+          if (points == 0) {
+            point_str = "0000";
+          }
+        }
+        setTextArray(this, this.points, point_str, "_p");
+      }, 800);
 
       let audio = input_word.length - 3;
       if (input_word.length > 6) audio = 3;
@@ -495,7 +512,7 @@ class WordHunts extends SimpleScene {
         this.wordsEnd.push(num);
       }
 
-      let point_str = points.toString();
+      let point_str = set_limit.toString();
       if (point_str.length < 4) {
         point_str = "0" + point_str;
         if (points == 0) {
@@ -514,7 +531,7 @@ class WordHunts extends SimpleScene {
       this.blanks = [];
       this.blank_words = [];
       this.point_vals = [];
-      let printout = 15;
+      let printout = 13;
       if (num_words <= printout) {
         printout = num_words;
       } else {
@@ -614,10 +631,11 @@ function setTextArray(scene, array, set, folder) {
 
 function updatePoints() {
   if (points < set_limit) {
-    if (set_limit - points <= 10) {
+    if (set_limit - points <= 5) {
       points = set_limit;
     } else {
-      points += Phaser.Math.Between(1, (set_limit - points) / 10);
+      let val = 2 - Math.floor(Math.random() * (set_limit / 100));
+      if (val >= 0) points += val;
     }
     let point_str = points.toString();
     while (point_str.length < 4) {

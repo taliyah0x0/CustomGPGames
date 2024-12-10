@@ -79,6 +79,7 @@ function startHuntGame() {
     .catch((error) => console.error("Error loading JSON:", error));
 
   document.getElementsByTagName("body")[0].innerHTML = `<div class="wh-floating-text"></div>`;
+  document.getElementsByTagName("body")[0].innerHTML += `<div class="more"></div>`;
   game = new Phaser.Game(huntconfig);
 }
 

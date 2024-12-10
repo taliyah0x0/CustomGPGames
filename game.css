@@ -31,7 +31,7 @@ body {
 .more {
   position: absolute;
   bottom: 20vh;
-  left: 32.5vw;
+  left: 33vw;
   font-size: 2vh;
   color: lightgrey;
   font-weight: bold;
@@ -43,6 +43,7 @@ body {
   font-size: 2.2vh;
   color: black;
   font-weight: bold;
+  transition: 0.2s ease;
 }
 
 .floating-temp {
