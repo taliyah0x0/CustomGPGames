@@ -43,7 +43,7 @@ class WordHunts extends SimpleScene {
     }
     this.load.image(":_t", "numbers/timer/:.png");
     
-    this.load.audio("music", "audio/whmusic.MP3")
+    this.load.audio("music", "audio/whmusic.mp3")
     this.load.audio("begin", "audio/begin.mp3");
     this.load.audio("tiktik", "audio/tiktik.mp3");
     this.load.audio("complete", "audio/complete.mp3");
