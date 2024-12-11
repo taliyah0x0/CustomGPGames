@@ -514,6 +514,7 @@ class Anagrams extends SimpleScene {
       });
       this.points.forEach(sprite => {
         this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
+        setTimeout (() => { sprite.alpha = 0; }, 200);
       });
       this.timer.forEach(sprite => {
         this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
@@ -648,7 +649,7 @@ function setTextArray(scene, array, set, folder) {
     } else if (folder == "_t") {
       distance = 20;
     }
-    let new_var = scene.add.sprite(array[array.length - 1].x + array.length * (deviceWidth * (distance / iphoneWidth)), array[array.length - 1].y, set[i] + folder);
+    let new_var = scene.add.sprite(deviceWidth * (590 / iphoneWidth) + array.length * (deviceWidth * (50 / iphoneWidth)), array[array.length - 1].y, set[i] + folder);
     new_var.setScale(scaleFactor);
     new_var.setOrigin(0, 0.5);
     array.push(new_var);
