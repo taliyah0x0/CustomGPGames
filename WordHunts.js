@@ -401,7 +401,8 @@ class WordHunts extends SimpleScene {
     let input_word = word_chosen.toLowerCase();
     if (filteredArray.includes(input_word) && !words.includes(input_word)) {
       words.push(input_word);
-      num_words += 1;
+      //num_words += 1;
+      num_words = 10;
       setTextArray(this, this.words, num_words.toString(), "_w");
       let point_val = 100;
       if (input_word.length > 3) point_val = (input_word.length - 3) * 400;
@@ -616,14 +617,17 @@ function setTextArray(scene, array, set, folder) {
   }
   for (var i = array.length; i < set.length; i++) {
     let distance = 0;
+    let offset = 0;
     if (folder == "_p") {
       distance = 50;
+      offset = 590;
     } else if (folder == "_w") {
       distance = 25;
+      offset = 490;
     } else if (folder == "_t") {
       distance = 20;
     }
-    let new_var = scene.add.sprite(deviceWidth * (590 / iphoneWidth) + array.length * (deviceWidth * (distance / iphoneWidth)), array[array.length - 1].y, set[i] + folder);
+    let new_var = scene.add.sprite(deviceWidth * (offset / iphoneWidth) + array.length * (deviceWidth * (distance / iphoneWidth)), array[array.length - 1].y, set[i] + folder);
     new_var.setScale(scaleFactor);
     new_var.setOrigin(0, 0.5);
     array.push(new_var);

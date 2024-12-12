@@ -642,14 +642,17 @@ function setTextArray(scene, array, set, folder) {
   }
   for (var i = array.length; i < set.length; i++) {
     let distance = 0;
+    let offset = 0;
     if (folder == "_p") {
       distance = 50;
+      offset = 590;
     } else if (folder == "_w") {
       distance = 25;
+      offset = 490;
     } else if (folder == "_t") {
       distance = 20;
     }
-    let new_var = scene.add.sprite(deviceWidth * (590 / iphoneWidth) + array.length * (deviceWidth * (distance / iphoneWidth)), array[array.length - 1].y, set[i] + folder);
+    let new_var = scene.add.sprite(deviceWidth * (offset / iphoneWidth) + array.length * (deviceWidth * (distance / iphoneWidth)), array[array.length - 1].y, set[i] + folder);
     new_var.setScale(scaleFactor);
     new_var.setOrigin(0, 0.5);
     array.push(new_var);
