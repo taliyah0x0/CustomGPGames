@@ -401,8 +401,7 @@ class WordHunts extends SimpleScene {
     let input_word = word_chosen.toLowerCase();
     if (filteredArray.includes(input_word) && !words.includes(input_word)) {
       words.push(input_word);
-      //num_words += 1;
-      num_words = 10;
+      num_words += 1;
       setTextArray(this, this.words, num_words.toString(), "_w");
       let point_val = 100;
       if (input_word.length > 3) point_val = (input_word.length - 3) * 400;
