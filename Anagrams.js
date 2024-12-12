@@ -62,6 +62,20 @@ class Anagrams extends SimpleScene {
   }
 
   create() {
+    deviceWidth = window.innerWidth;
+    deviceHeight = window.innerHeight;
+
+
+    if (window.innerHeight < window.innerWidth) {
+      deviceWidth *= 0.9;
+      deviceHeight *= 0.9;
+      deviceWidth = deviceHeight * (iphoneWidth / iphoneHeight);
+    } else {
+      deviceHeight = deviceWidth * (iphoneHeight / iphoneWidth);
+    }
+
+    scaleFactor = deviceWidth / 1179;
+    
     denominator = num_letters;
     if (num_letters <= 6) {
       denominator = 6;
@@ -554,11 +568,11 @@ class Anagrams extends SimpleScene {
         this.blanks = [];
         this.blank_words = [];
         this.point_vals = [];
-        let printout = 15;
+        let printout = 13;
         if (num_words <= printout) {
           printout = num_words;
         } else {
-        document.getElementsByClassName("more")[0].innerHTML = "(" + (num_words - 15) + " more)";
+        document.getElementsByClassName("more")[0].innerHTML = "(" + (num_words - 13) + " more)";
         }
         for (var i = 0; i < printout; i++) {
           let blank = this.add.sprite(deviceWidth * ((145 - ((6 - words[i].length) * 10)) / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), "blank");

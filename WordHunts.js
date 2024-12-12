@@ -60,6 +60,17 @@ class WordHunts extends SimpleScene {
     deviceWidth = window.innerWidth;
     deviceHeight = window.innerHeight;
 
+
+    if (window.innerHeight < window.innerWidth) {
+      deviceWidth *= 0.9;
+      deviceHeight *= 0.9;
+      deviceWidth = deviceHeight * (iphoneWidth / iphoneHeight);
+    } else {
+      deviceHeight = deviceWidth * (iphoneHeight / iphoneWidth);
+    }
+
+    scaleFactor = deviceWidth / 1179;
+
     this.music = this.sound.add("music", {loop: true});
     if (music) this.music.play();
     this.begin = this.sound.add("begin", {loop: false});
@@ -539,7 +550,7 @@ class WordHunts extends SimpleScene {
       if (num_words <= printout) {
         printout = num_words;
       } else {
-        document.getElementsByClassName("more")[0].innerHTML = "(" + (num_words - 15) + " more)";
+        document.getElementsByClassName("more")[0].innerHTML = "(" + (num_words - 13) + " more)";
       }
       for (var i = 0; i < printout; i++) {
         let blank = this.add.sprite(deviceWidth * ((145 - ((6 - words[i].length) * 10)) / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), "blank");
