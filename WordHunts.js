@@ -57,6 +57,9 @@ class WordHunts extends SimpleScene {
   }
 
   create() {
+    deviceWidth = window.innerWidth;
+    deviceHeight = window.innerHeight;
+
     this.music = this.sound.add("music", {loop: true});
     if (music) this.music.play();
     this.begin = this.sound.add("begin", {loop: false});
