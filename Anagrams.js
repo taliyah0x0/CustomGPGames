@@ -337,7 +337,7 @@ class Anagrams extends SimpleScene {
       }
 
       for (var i = 0; i < num_letters; i++) {
-        if (!letter_chain.includes(letter_inputs[i])) {
+        if (!letter_chosen.includes(i)) { // only move the letters that aren't selected yet
           this.addTween(this.letterButtons[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letterButtons[i].y, 100);
           this.addTween(this.letterShadows[i], 6/denominator * ( deviceWidth * (86 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letterShadows[i].y, 100);
           this.addTween(this.letters[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + shuffledArray[i] * deviceWidth * (163 / iphoneWidth)), this.letters[i].y, 100);

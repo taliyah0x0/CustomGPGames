@@ -131,11 +131,11 @@ class WordHunts extends SimpleScene {
       if (format > 4) { // if more than 4 rows or columns, need special scaling and shifting
         cover.x -= Math.pow(format / 4, 2) * deviceWidth * (9 / iphoneWidth);
         cover.y -= Math.pow(format / 4, 2) * deviceHeight * (9 / iphoneHeight);
-        cover.scale = scaleFactor * 1.1 * (4 / format);
+        cover.scale = scaleFactor * 1.15 * (4 / format);
         cover.x += (i % cols) * deviceWidth * (178 / iphoneWidth) * (4 / format);
         cover.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight) * (4 / format);
       } else {
-        cover.scale = scaleFactor * 1.1;
+        cover.scale = scaleFactor * 1.15;
         cover.x += (i % cols) * deviceWidth * (178 / iphoneWidth);
         cover.y += Math.floor(i / cols) * deviceHeight * (178 / iphoneHeight);
       }
