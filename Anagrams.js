@@ -1,15 +1,18 @@
-let letter_chain = [];
-let letter_chosen = [];
-let words = [];
-let num_words = 0;
-let points = 0;
-let set_limit = 0;
-let point_val = [100, 400, 1200, 2000, 3000, 4000, 5000];
-let setup = false;
-let gameScreen = 0;
-let denominator;
-let letter_stage = {};
-let pause = false;
+// TALIYAH HUANG
+/* Custom GamePigeon Games -- main game functionality in Phaser for Anagrams */
+
+let letter_chain = []; // letters currently being selected
+let letter_chosen = []; // indices of letters currently being selected
+let words = []; // list of words completed
+let num_words = 0; // count of words completed
+let points = 0; // keep track of points being displayed
+let set_limit = 0; // keep track of total points earned
+let point_val = [100, 400, 1200, 2000, 3000, 4000, 5000]; // point reward for 3-letter, 4-letter, etc.
+let setup = false; // just let the setup only run once
+let gameScreen = 0; // keep track of if we're on start, playmode, or ended
+let denominator; // used for scaling if more than 6 letters
+let letter_stage = {}; // keep track of if letter has been selected or not for the keyboard inputs
+let pause = false; // pause on when letters are in motion so you don't double move something
 
 class Anagrams extends SimpleScene {
 
@@ -22,7 +25,7 @@ class Anagrams extends SimpleScene {
     document.getElementsByTagName("div")[0].style.justifyContent = 'center';
   }
 
-  preload() {
+  preload() { // load all images and audio to be used
     this.load.image("start", "images/start.png");
     this.load.image("game", "images/game.png");
     this.load.image("letter", "images/letter.png");
@@ -62,28 +65,15 @@ class Anagrams extends SimpleScene {
   }
 
   create() {
-    deviceWidth = window.innerWidth;
-    deviceHeight = window.innerHeight;
-
-
-    if (window.innerHeight < window.innerWidth) {
-      deviceWidth *= 0.9;
-      deviceHeight *= 0.9;
-      deviceWidth = deviceHeight * (iphoneWidth / iphoneHeight);
-    } else {
-      deviceHeight = deviceWidth * (iphoneHeight / iphoneWidth);
-    }
-
-    scaleFactor = deviceWidth / 1179;
-    
+    // denominator is responsible for some scaling to do if more than 6 letters
     denominator = num_letters;
-    if (num_letters <= 6) {
-      denominator = 6;
-    }
+    if (num_letters <= 6) denominator = 6;
+
     for (let i = 0; i < num_letters; i++) {
       letter_stage[letter_inputs[i]] = 0;
     }
 
+    // create audios as game objects
     this.select = this.sound.add("select", { loop: false });
     this.deselect = this.sound.add("deselect", { loop: false });
     this.wrong = this.sound.add("wrong", { loop: false });
@@ -99,23 +89,28 @@ class Anagrams extends SimpleScene {
     this.music = this.sound.add("music", {loop: true});
     if (music) this.music.play();
 
+    // create the start screen
     this.startScreen = this.add.sprite(deviceWidth * 0.5 + no_start * -deviceWidth, deviceHeight * (907 / iphoneHeight), "start");
     this.startScreen.scale = scaleFactor;
     this.startScreen.setOrigin(0.5, 0.5);
 
+    // create the start button
     this.startButton = this.add.rectangle(deviceWidth * 0.5 + no_start * -deviceWidth, deviceHeight * (1235 / iphoneHeight), deviceWidth * (240 / iphoneWidth), deviceHeight * (100 / iphoneHeight), 0xffffff);
     this.startButton.setOrigin(0.5, 0.5);
     this.startButton.setAlpha(0.01);
     this.startButton.enableClick();
 
+    // create the game screen
     this.gameScreen = this.add.sprite(deviceWidth * 1.5 + no_start * -deviceWidth, deviceHeight * 0.5 + deviceHeight * (85 / iphoneHeight), "game");
     this.gameScreen.scale = scaleFactor;
     this.gameScreen.setOrigin(0.5, 0.5);
 
+    // create the end screen
     this.endScreen = this.add.sprite(deviceWidth * 1.5, deviceHeight * 0.5 + deviceHeight * (85 / iphoneHeight), "end");
     this.endScreen.scale = scaleFactor;
     this.endScreen.setOrigin(0.5, 0.5);
 
+    // create the boxes that go behind the letters
     this.dishes = [];
     for (var i = 0; i < num_letters; i++) {
       let letterDish = this.add.sprite(6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1517 / iphoneHeight) + (denominator === 6 ? 0 : 1) * denominator/6 * (deviceHeight * (16 / iphoneHeight)), "buttons");
@@ -124,6 +119,7 @@ class Anagrams extends SimpleScene {
       this.dishes.push(letterDish);
     }
 
+    // create the buttons for the letters
     this.letterButtons = [];
     for (var i = 0; i < num_letters; i++){
       let button = this.add.sprite(6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1592 / iphoneHeight), "letter");
@@ -135,6 +131,7 @@ class Anagrams extends SimpleScene {
       this.letterButtons.push(button);
     }
 
+    // create the white letter shadows that are offset slightly to the bottom right
     this.letterShadows = [];
     for (var i = 0; i < num_letters; i++) {
       let letter = this.add.sprite(6/denominator * (deviceWidth * (86 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1595 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])] + "_in");
@@ -146,6 +143,7 @@ class Anagrams extends SimpleScene {
       this.letterShadows.push(letter);
     }
 
+    // create the letters themselves
     this.letters = [];
     for (var i = 0; i < num_letters; i++) {
       let letter = this.add.sprite(6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1592 / iphoneHeight), alphabet[alphabet.indexOf(letter_inputs[i])]);
@@ -157,6 +155,7 @@ class Anagrams extends SimpleScene {
       this.letters.push(letter)
     }
 
+    // create the invisible selectable area boxes for the letters
     this.letterCovers = [];
     for (var i = 0; i < num_letters; i++) {
       let cover = this.add.rectangle(6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (1592 / iphoneHeight), 6/denominator * (deviceWidth * (130 / iphoneWidth)), 6/denominator * (deviceHeight * (130 / iphoneHeight)), 0xffffff);
@@ -168,22 +167,26 @@ class Anagrams extends SimpleScene {
       this.letterCovers.push(cover);
     }
 
+    // create the enter button
     this.enterButton = this.add.sprite(deviceWidth * 1.5 + no_start * -deviceWidth, deviceHeight * 0.5 + deviceHeight * (85 / iphoneHeight), "enter");
     this.enterButton.scale = scaleFactor;
     this.enterButton.setOrigin(0.5, 0.5);
     this.enterButton.setAlpha(0);
 
+    // create the invisible selectable area for the enter button
     this.enter = this.add.rectangle(deviceWidth * 0.5 + deviceWidth + no_start * -deviceWidth, deviceHeight * (1110 / iphoneHeight), deviceWidth * (570 / iphoneWidth), deviceHeight * (100 / iphoneHeight), 0xffffff);
     this.enter.setOrigin(0.5, 0.5);
     this.enter.setAlpha(0);
     this.enter.enableClick();
 
+    // create the number to keep count of words
     this.words = [];
     let word_num = this.add.sprite(deviceWidth * (490 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (604 / iphoneHeight), "0_w");
     word_num.setOrigin(0, 0.5);
     word_num.setScale(scaleFactor);
     this.words.push(word_num);
     
+    // create the number to keep count of points
     this.points = [];
     for (var i = 0; i < 4; i++) {
       let point = this.add.sprite(deviceWidth * (590 / iphoneWidth) + i * (deviceWidth * (50 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (657 / iphoneHeight), "0_p");
@@ -192,6 +195,7 @@ class Anagrams extends SimpleScene {
       this.points.push(point);
     }
 
+    // create the countdown time
     let str_min = countdownMin.toString();
     let str_sec = countdownSec.toString();
     if (countdownMin <= 9) {
@@ -210,6 +214,7 @@ class Anagrams extends SimpleScene {
       this.timer.push(time)
     }
 
+    // if we don't want to have a start screen, go straight to beginning the countdown
     if (no_start) {
       gameScreen = 1;
       this.time.addEvent({
@@ -220,22 +225,25 @@ class Anagrams extends SimpleScene {
       });
     }
 
+    // create the end button
     this.endButton = this.add.sprite(deviceWidth * (870 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (133 / iphoneHeight), "endButton");
     this.endButton.setScale(scaleFactor);
     this.endButton.enableClick();
 
-    if (!timer) {
+    if (!timer) { // if we don't want a timer, make it invisible
       for (let i = 0; i < this.timer.length; i++) {
         this.timer[i].setAlpha(0);
       }
     } else {
-      this.endButton.setAlpha(0);
+      this.endButton.setAlpha(0); // make the end button invisible
     }
 
+    // create the shuffle button
     this.shuffleButton = this.add.rectangle(deviceWidth * (80 / iphoneWidth) + deviceWidth, deviceHeight * (135 / iphoneHeight), deviceWidth * (95 / iphoneWidth), deviceHeight * (95 / iphoneHeight), 0xffffff);
     this.shuffleButton.setAlpha(0.01);
     this.shuffleButton.enableClick();
 
+    // create the play again button
     this.playAgain = this.add.sprite(deviceWidth * 0.5, deviceHeight * (350 / iphoneHeight), "playagain");
     this.playAgain.setScale(scaleFactor);
     this.playAgain.enableClick();
@@ -243,7 +251,7 @@ class Anagrams extends SimpleScene {
   }
 
   update() {
-    if (!setup) {
+    if (!setup) { // run setup once
       this.input.keyboard.on('keydown', (event) => {
         if (event.key == 'Enter' && gameScreen == 0) {
           this.startGame();
@@ -258,12 +266,12 @@ class Anagrams extends SimpleScene {
         }
 
         if (event.key.length === 1 && alphabet.includes(event.key.toUpperCase()) && gameScreen == 1 && letter_inputs.includes(event.key.toUpperCase()) && !pause) {
-          if (letter_stage[event.key.toUpperCase()] == 0) {
+          if (!letter_stage[event.key.toUpperCase()]) { // if the letter hasn't been selected yet
             this.moveLetter(curr_inputs.indexOf(event.key.toUpperCase()));
             if (!curr_inputs.includes(event.key.toUpperCase())) {
               letter_stage[event.key.toUpperCase()] = 1;
             }
-          } else {
+          } else { // if the letter has been selected already
             this.moveLetter(letter_chosen[letter_chain.indexOf(event.key.toUpperCase())]);
             if (!letter_chain.includes(event.key.toUpperCase())) {
               letter_stage[event.key.toUpperCase()] = 0;
@@ -279,34 +287,38 @@ class Anagrams extends SimpleScene {
     if (this.endButton.wasClicked()) this.endGame();
     if (this.playAgain.wasClicked()) window.location.reload();
 
+    // check if any of the letters was clicked on
     for (var i = 0; i < num_letters; i++) {
       if (this.letterCovers[i].wasClicked()) {
         this.moveLetter(i);
       }
     }
 
+    // if the letter is long enough and we're in play mode, make the enter button visible
     if (letter_chain.length >= 3 && gameScreen) {
       this.enterButton.setAlpha(1);
       this.enter.setAlpha(0.01);
-    } else {
+    } else { // otherwise hide it
       this.enterButton.setAlpha(0);
       this.enter.setAlpha(0);
     }
 
+    // run the shuffle letters program
     if (this.shuffleButton.wasClicked()) {
       if (sound) this.shuffle.play();
 
+      // create a default array with the number of letters
       let shuffledArray = [];
       for (var i = 0; i < num_letters; i++) {
         shuffledArray.push(i);
       }
 
-      // Iterate over the array from the end to the beginning
+      // iterate over the array from the end to the beginning
       for (let i = shuffledArray.length - 1; i > 0; i--) {
-          // Generate a random index
+          // generate a random index
           const j = Math.floor(Math.random() * (i + 1));
 
-          // Swap the elements at indices i and j
+          // swap the elements at indices i and j
           [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
       }
 
@@ -345,10 +357,13 @@ class Anagrams extends SimpleScene {
     }
   }
 
+  // function runs once at the start of the game
   startGame() {
     gameScreen = 1;
     this.startButton.setAlpha(0);
     if (sound) this.begin.play();
+
+    // move everything over from the right
     this.addTween(this.startScreen, -deviceWidth * 0.5, this.startScreen.y, 100);
     this.addTween(this.gameScreen, deviceWidth * 0.5, this.gameScreen.y, 100);
     this.addTween(this.enterButton, deviceWidth * 0.5, this.enterButton.y, 100);
@@ -374,6 +389,8 @@ class Anagrams extends SimpleScene {
       this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 100);
       this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 100);
     }
+
+    // begin the countdown
     this.time.addEvent({
         delay: 1000,
         callback: updateCountdown,
@@ -382,6 +399,7 @@ class Anagrams extends SimpleScene {
     });
   }
 
+  // adds an animation for moving elements
   addTween(target, x, y, duration) {
     this.tweens.add({
       targets: target,
@@ -392,6 +410,7 @@ class Anagrams extends SimpleScene {
     });
   }
 
+  // prevents user from clicking on the same letter again while in motion
   pauseAll() {
     pause = true;
     this.letterCovers.forEach(sprite => {
@@ -403,22 +422,24 @@ class Anagrams extends SimpleScene {
     });
   }
 
+  // function to check and handle words when entered
   enterWord () {
     let input_word = letter_chain.join("").toLowerCase();
-
-    if (filteredArray.includes(input_word) && !words.includes(input_word)) {
-
+    if (filteredArray.includes(input_word) && !words.includes(input_word)) { // new word that exists in dictionary
+      // increase word count
       words.push(input_word);
       num_words += 1;
       setTextArray(this, this.words, num_words.toString(), "_w");
+
+      // increase points count
       set_limit += point_val[input_word.length - 3];
-      this.time.addEvent({
+      this.time.addEvent({ // set the points incrementation animation
           delay: 1,
           callback: updatePoints,
           callbackScope: this,
           loop: true
       });
-      setTimeout(() => {
+      setTimeout(() => { // hard set the final points after a small delay
         points = set_limit;
         let point_str = points.toString();
         if (point_str.length < 4) {
@@ -431,23 +452,16 @@ class Anagrams extends SimpleScene {
       }, 800);
 
       if (sound) this.valid[input_word.length - 3].play();
-
       this.wordView(input_word, "+" + point_val[input_word.length - 3], 'white');
-
-    } else if (!filteredArray.includes(input_word)) {
-
+    } else if (!filteredArray.includes(input_word)) { // word doesn't exist in dictionary
       this.wordView(input_word, "Not in the vocabulary", 'red');
-
       if (sound) this.wrong.play();
-
-    } else if (words.includes(input_word)) {
-
+    } else if (words.includes(input_word)) { // word was already entered
       this.wordView(input_word, "Already used", 'red');
-
       if (sound) this.wrong.play();
-
     }
 
+    // move all letters back to bottom
     for (var i = 0; i < letter_chosen.length; i++) {
       this.addTween(this.letterButtons[letter_chosen[i]], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen[i] * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
       this.addTween(this.letterShadows[letter_chosen[i]], 6/denominator * (deviceWidth * (86 / iphoneWidth) + letter_chosen[i] * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1595 / iphoneHeight), 100);
@@ -458,6 +472,7 @@ class Anagrams extends SimpleScene {
     letter_chain = [];
   }
 
+  // function to handle the small floating text
   wordView(input, val, color) {
     let preview = input.toUpperCase() + " (" + val + ")";
     document.getElementsByTagName("div")[0].innerHTML += `<div class="floating-text">${preview}</div>`;
@@ -465,15 +480,16 @@ class Anagrams extends SimpleScene {
     if (color == 'red') {
       document.getElementsByClassName("floating-text")[chain.length - 1].style.color = '#eda9b0';
     }
-    setTimeout(() => {
+    setTimeout(() => { // make it disappear after a second
       document.getElementsByClassName("floating-text")[chain.length - 1].style.bottom = '30vh';
       document.getElementsByClassName("floating-text")[chain.length - 1].style.opacity = '0';
     }, 1);
   }
 
+  // function moves a letter to the top or bottom, depending on its current location
   moveLetter(i) {
-    this.pauseAll();
-    if (!letter_chosen.includes(i)) {
+    this.pauseAll(); // make sure nothing else can be selected
+    if (!letter_chosen.includes(i)) { // it's not on the top row
       this.addTween(this.letterButtons[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
       this.addTween(this.letterShadows[i], 6/denominator * (deviceWidth * (86 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1442 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
       this.addTween(this.letters[i], 6/denominator * (deviceWidth * (83 / iphoneWidth) + letter_chosen.length * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1439 / iphoneHeight) + (denominator === 6 ? 0 : 1) * Math.pow(denominator/6,2) * (deviceHeight * (22 / iphoneHeight)), 100);
@@ -485,12 +501,13 @@ class Anagrams extends SimpleScene {
       if (sound) this.select.play();
       letter_chosen.push(i);
 
-    } else {
+    } else { // it's on the top row, move it back down
       this.addTween(this.letterButtons[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
       this.addTween(this.letterShadows[i],  6/denominator * (deviceWidth * (86 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1595 / iphoneHeight), 100);
       this.addTween(this.letters[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
       this.addTween(this.letterCovers[i],  6/denominator * (deviceWidth * (83 / iphoneWidth) + i * deviceWidth * (163 / iphoneWidth)), deviceHeight * (1592 / iphoneHeight), 100);
 
+      // move any letters that were behind it to shift over one
       for (var j = letter_chosen.indexOf(i) + 1; j < letter_chosen.length; j++) {
         this.addTween(this.letterButtons[letter_chosen[j]], this.letterButtons[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterButtons[letter_chosen[j]].y, 100);
         this.addTween(this.letterShadows[letter_chosen[j]], this.letterShadows[letter_chosen[j]].x - 6/denominator * (deviceWidth * (163 / iphoneWidth)), this.letterShadows[letter_chosen[j]].y, 100);
@@ -506,125 +523,135 @@ class Anagrams extends SimpleScene {
     }
   }
 
-    endGame () {
-      if (sound) {
-        this.tiktik.stop();
-        this.complete.play();
-      }
-
-      this.addTween(this.gameScreen, -1.5 * deviceWidth, this.gameScreen.y, 100);
-      for (var i = 0; i < num_letters; i++) {
-        this.addTween(this.letterButtons[i], this.letterButtons[i].x - deviceWidth, this.letterButtons[i].y, 100);
-        this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 100);
-        this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 100);
-        this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 100);
-        this.addTween(this.dishes[i], this.dishes[i].x - deviceWidth, this.dishes[i].y, 100);
-      }
-
-      this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 100);
-
-      this.words.forEach(sprite => {
-        this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
-      });
-      this.points.forEach(sprite => {
-        this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
-        setTimeout (() => { sprite.alpha = 0; }, 200);
-      });
-      this.timer.forEach(sprite => {
-        this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
-      });
-
-      this.addTween(this.endScreen, 0.5 * deviceWidth, this.endScreen.y, 100);
-
-      gameScreen = 2;
-
-      setTimeout(() => {
-        this.playAgain.setAlpha(1);
-        let num_string = num_words.toString();
-        this.wordsEnd = [];
-        for (var i = 0; i < num_string.length; i++) {
-          let num = this.add.sprite(deviceWidth * (190 / iphoneWidth) + i * deviceWidth * (20 / iphoneWidth), deviceHeight * (580 / iphoneHeight), num_string[i] + "_w");
-          num.setScale(scaleFactor * 0.8);
-          num.setOrigin(0, 0.5);
-          this.wordsEnd.push(num);
-        }
-
-        let point_str = points.toString();
-        if (point_str.length < 4) {
-          point_str = "0" + point_str;
-          if (points == 0) {
-            point_str = "0000";
-          }
-        }
-        this.pointsEnd = [];
-        for (var i = 0; i < point_str.length; i++) {
-          let num = this.add.sprite(deviceWidth * (240 / iphoneWidth) + i * deviceWidth * (25 / iphoneWidth), deviceHeight * (620 / iphoneHeight), point_str[i] + "_w");
-          num.setScale(scaleFactor);
-          num.setOrigin(0, 0.5);
-          this.pointsEnd.push(num);
-        }
-
-        words.sort((a, b) => b.length - a.length);
-        this.blanks = [];
-        this.blank_words = [];
-        this.point_vals = [];
-        let printout = 13;
-        if (num_words <= printout) {
-          printout = num_words;
-        } else {
-        document.getElementsByClassName("more")[0].innerHTML = "(" + (num_words - 13) + " more)";
-        }
-        for (var i = 0; i < printout; i++) {
-          let blank = this.add.sprite(deviceWidth * ((145 - ((6 - words[i].length) * 10)) / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), "blank");
-          blank.setOrigin(0.5, 0.5);
-          blank.scaleY = scaleFactor;
-          blank.scaleX = scaleFactor - (6 - words[i].length) * 0.12 * scaleFactor;
-          this.blanks.push(blank);
-          
-          let tempWord = words[i].toUpperCase();
-          for (var j = 0; j < tempWord.length; j++) {
-            let blank_letter = this.add.sprite(deviceWidth * (66 / iphoneWidth) + j * deviceWidth * (26 / iphoneWidth), deviceHeight * ((705 + i * 55) / iphoneHeight), tempWord[j] + "_f");
-            blank_letter.setOrigin(0, 0.5);
-            blank_letter.setScale(scaleFactor);
-            this.blank_words.push(blank_letter);
-          }
-          
-          let dispVal = point_val[words[i].length - 3].toString();
-          for (var j = 0; j < dispVal.length; j++) {
-            let blank_val = this.add.sprite(deviceWidth * (435 / iphoneWidth) - j * deviceWidth * (21 / iphoneWidth), deviceHeight * ((705 + i * 55) / iphoneHeight), dispVal[dispVal.length - j - 1] + "_f");
-            blank_val.setOrigin(1, 0.5);
-            blank_val.setScale(scaleFactor);
-            this.point_vals.push(blank_val);
-          }
-        }
-      }, 100);
+  // function for when the game has ended
+  endGame () {
+    if (sound) {
+      this.tiktik.stop();
+      this.complete.play();
     }
+
+    // move everything off the screen to the left
+    this.addTween(this.gameScreen, -1.5 * deviceWidth, this.gameScreen.y, 100);
+    for (var i = 0; i < num_letters; i++) {
+      this.addTween(this.letterButtons[i], this.letterButtons[i].x - deviceWidth, this.letterButtons[i].y, 100);
+      this.addTween(this.letterShadows[i], this.letterShadows[i].x - deviceWidth, this.letterShadows[i].y, 100);
+      this.addTween(this.letters[i], this.letters[i].x - deviceWidth, this.letters[i].y, 100);
+      this.addTween(this.letterCovers[i], this.letterCovers[i].x - deviceWidth, this.letterCovers[i].y, 100);
+      this.addTween(this.dishes[i], this.dishes[i].x - deviceWidth, this.dishes[i].y, 100);
+    }
+
+    this.addTween(this.endButton, this.endButton.x - deviceWidth, this.endButton.y, 100);
+
+    this.words.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
+    });
+    this.points.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
+      setTimeout (() => { sprite.alpha = 0; }, 200);
+    });
+    this.timer.forEach(sprite => {
+      this.addTween(sprite, sprite.x - deviceWidth, sprite.y, 100);
+    });
+
+    this.addTween(this.endScreen, 0.5 * deviceWidth, this.endScreen.y, 100);
+
+    gameScreen = 2;
+
+    setTimeout(() => { // small pause to allow the animation to finish
+      this.playAgain.setAlpha(1);
+      let num_string = num_words.toString();
+      // set the number of words
+      this.wordsEnd = [];
+      for (var i = 0; i < num_string.length; i++) {
+        let num = this.add.sprite(deviceWidth * (190 / iphoneWidth) + i * deviceWidth * (20 / iphoneWidth), deviceHeight * (580 / iphoneHeight), num_string[i] + "_w");
+        num.setScale(scaleFactor * 0.8);
+        num.setOrigin(0, 0.5);
+        this.wordsEnd.push(num);
+      }
+
+      // set the number of points
+      let point_str = points.toString();
+      if (point_str.length < 4) {
+        point_str = "0" + point_str;
+        if (points == 0) {
+          point_str = "0000";
+        }
+      }
+      this.pointsEnd = [];
+      for (var i = 0; i < point_str.length; i++) {
+        let num = this.add.sprite(deviceWidth * (240 / iphoneWidth) + i * deviceWidth * (25 / iphoneWidth), deviceHeight * (620 / iphoneHeight), point_str[i] + "_w");
+        num.setScale(scaleFactor);
+        num.setOrigin(0, 0.5);
+        this.pointsEnd.push(num);
+      }
+
+      // sort the words with longest first
+      words.sort((a, b) => b.length - a.length);
+      this.blanks = [];
+      this.blank_words = [];
+      this.point_vals = [];
+      let printout = 13;
+      if (num_words <= printout) {
+        printout = num_words;
+      } else { // if there are too many words to fit on the screen
+        document.getElementsByClassName("more")[0].innerHTML = "(" + (num_words - 13) + " more)";
+      }
+      // create all the words
+      for (var i = 0; i < printout; i++) {
+        // make the background of the word
+        let blank = this.add.sprite(deviceWidth * ((145 - ((6 - words[i].length) * 10)) / iphoneWidth), deviceHeight * ((710 + i * 55) / iphoneHeight), "blank");
+        blank.setOrigin(0.5, 0.5);
+        blank.scaleY = scaleFactor;
+        blank.scaleX = scaleFactor - (6 - words[i].length) * 0.12 * scaleFactor;
+        this.blanks.push(blank);
+        
+        // create the word itself
+        let tempWord = words[i].toUpperCase();
+        for (var j = 0; j < tempWord.length; j++) {
+          let blank_letter = this.add.sprite(deviceWidth * (66 / iphoneWidth) + j * deviceWidth * (26 / iphoneWidth), deviceHeight * ((705 + i * 55) / iphoneHeight), tempWord[j] + "_f");
+          blank_letter.setOrigin(0, 0.5);
+          blank_letter.setScale(scaleFactor);
+          this.blank_words.push(blank_letter);
+        }
+        
+        // add the associated point value
+        let dispVal = point_val[words[i].length - 3].toString();
+        for (var j = 0; j < dispVal.length; j++) {
+          let blank_val = this.add.sprite(deviceWidth * (435 / iphoneWidth) - j * deviceWidth * (21 / iphoneWidth), deviceHeight * ((705 + i * 55) / iphoneHeight), dispVal[dispVal.length - j - 1] + "_f");
+          blank_val.setOrigin(1, 0.5);
+          blank_val.setScale(scaleFactor);
+          this.point_vals.push(blank_val);
+        }
+      }
+    }, 100);
+  }
 }
 
+// function counts down the timer by second
 function updateCountdown() {
   if (timer) {
     countdownSec--;
-  if (countdownSec == -1 && countdownMin >= 1) {
-    countdownMin -= 1;
-    countdownSec = 59;
-  }
+    if (countdownSec == -1 && countdownMin >= 1) { // count down a minute if we've reached the end for the seconds
+      countdownMin -= 1;
+      countdownSec = 59;
+    }
 
-  let str_min = countdownMin.toString();
-  let str_sec = countdownSec.toString();
-  if (countdownMin <= 9) {
-    str_min = "0" + countdownMin.toString();
-  }
-  if (countdownSec <= 9) {
-    str_sec = "0" + countdownSec.toString();
-  }
-  let str_time = str_min + ":" + str_sec;
+    let str_min = countdownMin.toString();
+    let str_sec = countdownSec.toString();
+    if (countdownMin <= 9) {
+      str_min = "0" + countdownMin.toString();
+    }
+    if (countdownSec <= 9) {
+      str_sec = "0" + countdownSec.toString();
+    }
+    let str_time = str_min + ":" + str_sec;
 
-  if (countdownMin == 0 && countdownSec == 5 && sound) {
-    this.tiktik.play();
-  }
+    if (countdownMin == 0 && countdownSec == 5 && sound) {
+      this.tiktik.play();
+    }
 
     if (countdownSec == -1 && countdownMin == 0 && countdownSec != -10) {
-      this.time.removeAllEvents();  // Stop the countdown
+      this.time.removeAllEvents();  // stop the countdown
       const scene = game.scene.keys.Anagrams;
       scene.endGame();
       countdownSec = -10;
@@ -634,11 +661,12 @@ function updateCountdown() {
   }
 }
 
+// function updates the points with an incrementing animation
 function updatePoints() {
-  if (points < set_limit) {
-    if (set_limit - points <= 5) {
+  if (points < set_limit) { // continue updating if displayed points is lower than expected total
+    if (set_limit - points <= 5) { // automatically set to the final if we're close enough
       points = set_limit;
-    } else {
+    } else { // add a random increment
       let val = 2 - Math.floor(Math.random() * (set_limit / 1000));
       if (val >= 0) points += val;
     }
@@ -650,6 +678,7 @@ function updatePoints() {
   }
 }
 
+// function edits an array of images next to each other as if it is text
 function setTextArray(scene, array, set, folder) {
   for (var i = 0; i < array.length; i++) {
     array[i].setTexture(set[i] + folder);
@@ -657,13 +686,14 @@ function setTextArray(scene, array, set, folder) {
   for (var i = array.length; i < set.length; i++) {
     let distance = 0;
     let offset = 0;
-    if (folder == "_p") {
+    // set parameters depending on type of text
+    if (folder == "_p") { // if points
       distance = 50;
       offset = 590;
-    } else if (folder == "_w") {
+    } else if (folder == "_w") { // if number of words count
       distance = 25;
       offset = 490;
-    } else if (folder == "_t") {
+    } else if (folder == "_t") { // if end game display word
       distance = 20;
     }
     let new_var = scene.add.sprite(deviceWidth * (offset / iphoneWidth) + array.length * (deviceWidth * (distance / iphoneWidth)), array[array.length - 1].y, set[i] + folder);
