@@ -3,6 +3,7 @@
 
 let letter_chain = []; // letters being selected as an array
 let word_chosen = ""; // letters being selected as a string
+let new_word_chosen = "";
 let prev_word = ""; // last word that was selected but not completed
 let words = []; // array of all words completed
 let num_words = 0; // number of words that were completed
@@ -219,7 +220,7 @@ class WordHunts extends SimpleScene {
       if (word_chosen.length >= 3) {
         if (languages == "kr") {
           let jamo_list = word_chosen.split('');
-          let new_word_chosen = combineJamoList(jamo_list);
+          new_word_chosen = combineJamoList(jamo_list);
           this.enterWord(new_word_chosen);
         } else {
           this.enterWord(word_chosen); // if more than 3 letters, try to enter it
@@ -348,12 +349,13 @@ class WordHunts extends SimpleScene {
               this.chain.scaleX += deviceWidth * (0.063 / iphoneWidth) + (languages == 'jp' || languages == 'zy' || languages == 'kr') * 0.015;
               letter_chain.push(i);
               prev_word = word_chosen;
+              if (languages == "kr") prev_word = new_word_chosen;
               word_chosen += letter_inputs[i];
               document.getElementsByClassName("wh-floating-text")[0].style.transition = "none";
               document.getElementsByClassName("wh-floating-text")[0].style.opacity = 1;
               if (languages == "kr") {
                 let jamo_list = word_chosen.split('');
-                let new_word_chosen = combineJamoList(jamo_list);
+                new_word_chosen = combineJamoList(jamo_list);
                 document.getElementsByClassName("wh-floating-text")[0].innerHTML = new_word_chosen;
                 let diff = word_chosen.split('').length - new_word_chosen.split('').length;
                 for (var k = 0; k < diff - kr_save; k++) {
@@ -412,6 +414,7 @@ class WordHunts extends SimpleScene {
   // function checks if a word is in the dictionary
   checkWord () {
     let input_word = word_chosen.toLowerCase();
+    if (languages == "kr") input_word = new_word_chosen;
     prev_word = prev_word.toLowerCase();
     if (filteredArray.includes(input_word) && !words.includes(input_word)) { // it's a new word and in the dictionary
       if (sound) this.pop.play();
@@ -436,8 +439,8 @@ class WordHunts extends SimpleScene {
   }
 
   // function to enter a valid word
-  enterWord (word_chosen) {
-    let input_word = word_chosen.toLowerCase();
+  enterWord (word) {
+    let input_word = word.toLowerCase();
     if (filteredArray.includes(input_word) && !words.includes(input_word)) { // it's a new word that is in the dictionary
       words.push(input_word);
       num_words += 1;
@@ -464,6 +467,7 @@ class WordHunts extends SimpleScene {
       }, 800);
 
       let audio = input_word.length - 3; // audio is different depending on word length
+      if (languages == "kr") audio = word_chosen.length - 3;
       if (input_word.length > 6) audio = 3; // play the longest word count
       if (sound) this.valid[audio].play();
     }
@@ -702,15 +706,17 @@ function updatePoints() {
   }
 }
 
-// function combines korean syllables
+// function combines korean syllables to form korean characters
 function combineJamoList(jamoList) {
+  let combinations = [];
+  let ver = 1;
+
   const initials = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
   const medials = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
   const finals = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
   
   let result = [];
   let last = 0;
-  let start = 0;
 
   function flushBuffer(begin, end) {
     for (var i = begin; i < end; i++) {
@@ -720,22 +726,23 @@ function combineJamoList(jamoList) {
   }
 
   function checkWord(i) {
-    console.log(jamoList[i]);
     if (i + 1 < jamoList.length && medials.includes(jamoList[i+1])) {
       const initialIndex = initials.indexOf(jamoList[i]);
       const medialIndex = medials.indexOf(jamoList[i+1].length > 1 ? jamoList[i+1][0] : jamoList[i+1]);
 
-      if (i + 2 < jamoList.length && finals.includes(jamoList[i+2])) {
+      if (!ver && i + 2 < jamoList.length && finals.includes(jamoList[i+2])) {
         const finalIndex = finals.indexOf(jamoList[i+2]);
         const syllableCodePoint = 0xAC00 + (initialIndex * 588) + (medialIndex * 28) + finalIndex;
         result.push(String.fromCharCode(syllableCodePoint));
         last = i + 3;
+        ver = 1;
         return i + 2;
       } else {
         const finalIndex = finals.indexOf('');
         const syllableCodePoint = 0xAC00 + (initialIndex * 588) + (medialIndex * 28) + finalIndex;
         result.push(String.fromCharCode(syllableCodePoint));
         last = i + 2;
+        ver = 1;
         return i + 1;
       }
     } else {
@@ -745,13 +752,40 @@ function combineJamoList(jamoList) {
   }
 
   for (var i = 0; i < jamoList.length; i++) {
-    if (!start && initials.includes(jamoList[i])) {
+    if (initials.includes(jamoList[i])) {
       flushBuffer(last, i);
       i = checkWord(i);
     } else {
-      console.log(jamoList[i])
       flushBuffer(last, i+1);
     }
   }
-  return result.join('');
+
+  // push version with final
+  combinations.push(result.join(''));
+
+  // reset and recalculate without final
+  result = [];
+  last = 0;
+
+  for (var i = 0; i < jamoList.length; i++) {
+    if (initials.includes(jamoList[i])) {
+      flushBuffer(last, i);
+      i = checkWord(i);
+    } else {
+      flushBuffer(last, i+1);
+    }
+  }
+
+  // push version without final
+  combinations.push(result.join(''));
+
+  // check if any are valid words
+  for (var i = 0; i < combinations.length; i++) {
+    if (filteredArray.includes(combinations[i])) {
+      return combinations[i]; // push the valid word
+    }
+  }
+  
+  // push default
+  return combinations[0];
 }

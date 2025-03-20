@@ -79,7 +79,11 @@ function startHuntGame() {
     .then((data) => {
       // combine all arrays into a single array
       const combinedArray = Object.values(data).flat();
-      filteredArray = combinedArray.filter((word) => word.length >= 3);
+      if (dict == "kr-ken") {
+        filteredArray = combinedArray;
+      } else {
+        filteredArray = combinedArray.filter((word) => word.length >= 3);
+      }
     })
     .catch((error) => console.error("Error loading JSON:", error));
 

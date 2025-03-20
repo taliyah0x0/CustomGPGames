@@ -181,7 +181,7 @@ with open('dictionaries/py-sub.json', 'w', encoding='utf-8') as json_file:
     json.dump(pinyins, json_file, ensure_ascii=False, separators=(',', ':'))'''
 
 # Kengdic korean csv to json
-'''import pandas
+import pandas
 import json
 import re
 
@@ -290,7 +290,6 @@ for i in range(len(raw)):
         if j in convert:
             flag = 1
     if convert not in korean and flag == 0:
-        korean.append(convert)
         jamo_list = split_hangul(convert)
         flag = 0
         pops = []
@@ -301,11 +300,13 @@ for i in range(len(raw)):
             jamo_list.pop(pops[j])
         if flag == 0:
             korean_syll += jamo_list
+        if len(jamo_list) >= 3:
+            korean.append(convert)
 
 with open('dictionaries/kr-ken.json', 'w', encoding='utf-8') as json_file:
     json.dump(korean, json_file, ensure_ascii=False, separators=(',', ':'))
 
-with open('dictionaries/kr-jamo.json', 'w', encoding='utf-8') as json_file:
+'''with open('dictionaries/kr-jamo.json', 'w', encoding='utf-8') as json_file:
     json.dump(korean_syll, json_file, ensure_ascii=False, separators=(',', ':'))'''
 
 
@@ -336,7 +337,7 @@ with open('dictionaries/ab-git.json', 'w', encoding='utf-8') as json_file:
     json.dump(words, json_file, ensure_ascii=False, separators=(',', ':'))'''
 
 # Hindi Dictionary CSV to JSON
-import pandas
+'''import pandas
 import json
 import re
 
@@ -360,4 +361,4 @@ for i in range(len(raw)):
     for j in range(len(convert_list)):
         new_list.append(convert_list[j])
 with open('dictionaries/hi-git.json', 'w', encoding='utf-8') as json_file:
-    json.dump(new_list, json_file, ensure_ascii=False, separators=(',', ':'))
+    json.dump(new_list, json_file, ensure_ascii=False, separators=(',', ':'))'''
