@@ -259,7 +259,7 @@ function edit(type, direction) {
   makeLetterBoxes();
 }
 
-// VIET'S CODE BELOW
+// HERE LIES VIET'S CODE BELOW 🪦
 /*const TOTAL_LETTERS = 16;
 let dictionary;
 // More vowels to increase their chances of appearing

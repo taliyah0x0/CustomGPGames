@@ -9,6 +9,7 @@ let num_words = 0; // number of words that were completed
 let points = 0; // keep track of points being displayed
 let set_limit = 0; // keep track of total points earned
 let gameScreen = 0; // keep track of if we're on start, playmode, or ended
+let kr_save = 1; // used to keep track of actual length of korean
 
 class WordHunts extends SimpleScene {
 
@@ -215,7 +216,15 @@ class WordHunts extends SimpleScene {
     
     // handle the letter selection when the pointer is released
     this.input.on('pointerup', (pointer) => {
-      if (word_chosen.length >= 3) this.enterWord(word_chosen); // if more than 3 letters, try to enter it
+      if (word_chosen.length >= 3) {
+        if (languages == "kr") {
+          let jamo_list = word_chosen.split('');
+          let new_word_chosen = combineJamoList(jamo_list);
+          this.enterWord(new_word_chosen);
+        } else {
+          this.enterWord(word_chosen); // if more than 3 letters, try to enter it
+        }
+      }
       for (var i = 0; i < rows * cols; i++) { // clear the white selection on the letters
         if (this.letterFills[i].alpha == 0.9) {
           if (sound) this.deselect.play();
@@ -336,13 +345,24 @@ class WordHunts extends SimpleScene {
               this.line.setAlpha(0.5);
               this.letterFills[i].setAlpha(0.9);
               this.chain.setAlpha(1);
-              this.chain.scaleX += deviceWidth * (0.063 / iphoneWidth) + (languages == 'jp') * 0.015;
+              this.chain.scaleX += deviceWidth * (0.063 / iphoneWidth) + (languages == 'jp' || languages == 'zy' || languages == 'kr') * 0.015;
               letter_chain.push(i);
               prev_word = word_chosen;
               word_chosen += letter_inputs[i];
               document.getElementsByClassName("wh-floating-text")[0].style.transition = "none";
               document.getElementsByClassName("wh-floating-text")[0].style.opacity = 1;
-              document.getElementsByClassName("wh-floating-text")[0].innerHTML = word_chosen;
+              if (languages == "kr") {
+                let jamo_list = word_chosen.split('');
+                let new_word_chosen = combineJamoList(jamo_list);
+                document.getElementsByClassName("wh-floating-text")[0].innerHTML = new_word_chosen;
+                let diff = word_chosen.split('').length - new_word_chosen.split('').length;
+                for (var k = 0; k < diff - kr_save; k++) {
+                  this.chain.scaleX -= deviceWidth * (0.063 / iphoneWidth) + 0.015;
+                }
+                kr_save = diff;
+              } else {
+                document.getElementsByClassName("wh-floating-text")[0].innerHTML = word_chosen;
+              }
               this.checkWord();
             if (letter_chain.length == 0) { // create the red line but it goes nowhere
               this.line.beginPath();
@@ -426,7 +446,7 @@ class WordHunts extends SimpleScene {
       if (input_word.length > 3) point_val = (input_word.length - 3) * 400; // set the appropriate point increase
       set_limit += point_val;
       this.time.addEvent({ // start the point incrementing animation
-          delay: 1,
+          delay: 1, // delay of 1 millisecond between each call
           callback: updatePoints,
           callbackScope: this,
           loop: true
@@ -680,4 +700,58 @@ function updatePoints() {
     }
     setTextArray(this, this.points, point_str, "_p");
   }
+}
+
+// function combines korean syllables
+function combineJamoList(jamoList) {
+  const initials = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+  const medials = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
+  const finals = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+  
+  let result = [];
+  let last = 0;
+  let start = 0;
+
+  function flushBuffer(begin, end) {
+    for (var i = begin; i < end; i++) {
+      result.push(jamoList[i]);
+    }
+    last = end;
+  }
+
+  function checkWord(i) {
+    console.log(jamoList[i]);
+    if (i + 1 < jamoList.length && medials.includes(jamoList[i+1])) {
+      const initialIndex = initials.indexOf(jamoList[i]);
+      const medialIndex = medials.indexOf(jamoList[i+1].length > 1 ? jamoList[i+1][0] : jamoList[i+1]);
+
+      if (i + 2 < jamoList.length && finals.includes(jamoList[i+2])) {
+        const finalIndex = finals.indexOf(jamoList[i+2]);
+        const syllableCodePoint = 0xAC00 + (initialIndex * 588) + (medialIndex * 28) + finalIndex;
+        result.push(String.fromCharCode(syllableCodePoint));
+        last = i + 3;
+        return i + 2;
+      } else {
+        const finalIndex = finals.indexOf('');
+        const syllableCodePoint = 0xAC00 + (initialIndex * 588) + (medialIndex * 28) + finalIndex;
+        result.push(String.fromCharCode(syllableCodePoint));
+        last = i + 2;
+        return i + 1;
+      }
+    } else {
+      flushBuffer(i, i+1);
+      return i;
+    }
+  }
+
+  for (var i = 0; i < jamoList.length; i++) {
+    if (!start && initials.includes(jamoList[i])) {
+      flushBuffer(last, i);
+      i = checkWord(i);
+    } else {
+      console.log(jamoList[i])
+      flushBuffer(last, i+1);
+    }
+  }
+  return result.join('');
 }

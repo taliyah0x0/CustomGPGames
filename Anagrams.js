@@ -13,6 +13,7 @@ let gameScreen = 0; // keep track of if we're on start, playmode, or ended
 let denominator; // used for scaling if more than 6 letters
 let letter_stage = {}; // keep track of if letter has been selected or not for the keyboard inputs
 let pause = false; // pause on when letters are in motion so you don't double move something
+let kr_save = ""; // used to keep track of actual length of korean
 
 class Anagrams extends SimpleScene {
 
@@ -425,6 +426,11 @@ class Anagrams extends SimpleScene {
   // function to check and handle words when entered
   enterWord () {
     let input_word = letter_chain.join("").toLowerCase();
+    if (languages == "kr") {
+      let jamo_list = input_word.split('');
+      kr_save = input_word;
+      input_word = combineJamoList(jamo_list);
+    }
     if (filteredArray.includes(input_word) && !words.includes(input_word)) { // new word that exists in dictionary
       // increase word count
       words.push(input_word);
@@ -451,8 +457,13 @@ class Anagrams extends SimpleScene {
         setTextArray(this, this.points, point_str, "_p");
       }, 800);
 
-      if (sound) this.valid[input_word.length - 3].play();
-      this.wordView(input_word, "+" + point_val[input_word.length - 3], 'white');
+      if (languages == "kr") {
+        if (sound) this.valid[kr_save.length - 3].play();
+        this.wordView(input_word, "+" + point_val[kr_save.length - 3], 'white');
+      } else {
+        if (sound) this.valid[input_word.length - 3].play();
+        this.wordView(input_word, "+" + point_val[input_word.length - 3], 'white');
+      }
     } else if (!filteredArray.includes(input_word)) { // word doesn't exist in dictionary
       this.wordView(input_word, "Not in the vocabulary", 'red');
       if (sound) this.wrong.play();
@@ -701,4 +712,56 @@ function setTextArray(scene, array, set, folder) {
     new_var.setOrigin(0, 0.5);
     array.push(new_var);
   }
+}
+
+// function combines korean syllables
+function combineJamoList(jamoList) {
+  const initials = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+  const medials = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
+  const finals = ['', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
+  
+  let result = [];
+  let last = 0;
+  let start = 0;
+
+  function flushBuffer(begin, end) {
+    for (var i = begin; i < end; i++) {
+      result.push(jamoList[i]);
+    }
+    last = end;
+  }
+
+  function checkWord(i) {
+    if (i + 1 < jamoList.length && medials.includes(jamoList[i+1])) {
+      const initialIndex = initials.indexOf(jamoList[i]);
+      const medialIndex = medials.indexOf(jamoList[i+1].length > 1 ? jamoList[i+1][0] : jamoList[i+1]);
+
+      if (i + 2 < jamoList.length && finals.includes(jamoList[i+2])) {
+        const finalIndex = finals.indexOf(jamoList[i+2]);
+        const syllableCodePoint = 0xAC00 + (initialIndex * 588) + (medialIndex * 28) + finalIndex;
+        result.push(String.fromCharCode(syllableCodePoint));
+        last = i + 3;
+        return i + 2;
+      } else {
+        const finalIndex = finals.indexOf('');
+        const syllableCodePoint = 0xAC00 + (initialIndex * 588) + (medialIndex * 28) + finalIndex;
+        result.push(String.fromCharCode(syllableCodePoint));
+        last = i + 2;
+        return i + 1;
+      }
+    } else {
+      flushBuffer(i, i+1);
+      return i;
+    }
+  }
+
+  for (var i = 0; i < jamoList.length; i++) {
+    if (!start && initials.includes(jamoList[i])) {
+      flushBuffer(last, i);
+      i = checkWord(i);
+    } else {
+      flushBuffer(last, i+1);
+    }
+  }
+  return result.join('');
 }
