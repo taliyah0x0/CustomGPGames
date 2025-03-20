@@ -422,7 +422,11 @@ class WordHunts extends SimpleScene {
         this.chain.scaleX += deviceWidth * (0.063 / iphoneWidth);
       }
       let point_val = 100;
-      if (input_word.length > 3) point_val = (input_word.length - 3) * 400; // set the point increase
+      if (languages == "kr") {
+        if (word_chosen.length > 3) point_val = (word_chosen.length - 3) * 400; // set the point increase
+      } else {
+        if (input_word.length > 3) point_val = (input_word.length - 3) * 400; // set the point increase
+      }
       document.getElementsByClassName("wh-floating-text")[0].innerHTML += ` (+${point_val})`; // set the preview points
       this.chain.setTint(0xa8fc98); // switch to green
     } else if (filteredArray.includes(input_word) && words.includes(input_word)) { // word was already used
@@ -446,7 +450,11 @@ class WordHunts extends SimpleScene {
       num_words += 1;
       setTextArray(this, this.words, num_words.toString(), "_w"); // increase the word count
       let point_val = 100;
-      if (input_word.length > 3) point_val = (input_word.length - 3) * 400; // set the appropriate point increase
+      if (languages == "kr") {
+        if (word_chosen.length > 3) point_val = (word_chosen.length - 3) * 400; // set the appropriate point increase
+      } else {
+        if (input_word.length > 3) point_val = (input_word.length - 3) * 400; // set the appropriate point increase
+      }
       set_limit += point_val;
       this.time.addEvent({ // start the point incrementing animation
           delay: 1, // delay of 1 millisecond between each call
