@@ -717,7 +717,6 @@ function updatePoints() {
 // function combines korean syllables to form korean characters
 function combineJamoList(jamoList) {
   let combinations = [];
-  let ver = 1;
 
   const initials = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'];
   const medials = ['ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'];
@@ -733,7 +732,7 @@ function combineJamoList(jamoList) {
     last = end;
   }
 
-  function checkWord(i) {
+  function checkWord(i, ver) {
     if (i + 1 < jamoList.length && medials.includes(jamoList[i+1])) {
       const initialIndex = initials.indexOf(jamoList[i]);
       const medialIndex = medials.indexOf(jamoList[i+1].length > 1 ? jamoList[i+1][0] : jamoList[i+1]);
@@ -743,7 +742,6 @@ function combineJamoList(jamoList) {
         const syllableCodePoint = 0xAC00 + (initialIndex * 588) + (medialIndex * 28) + finalIndex;
         result.push(String.fromCharCode(syllableCodePoint));
         last = i + 3;
-        ver = 1;
         return i + 2;
       } else {
         const finalIndex = finals.indexOf('');
@@ -762,7 +760,7 @@ function combineJamoList(jamoList) {
   for (var i = 0; i < jamoList.length; i++) {
     if (initials.includes(jamoList[i])) {
       flushBuffer(last, i);
-      i = checkWord(i);
+      i = checkWord(i, 0);
     } else {
       flushBuffer(last, i+1);
     }
@@ -778,7 +776,7 @@ function combineJamoList(jamoList) {
   for (var i = 0; i < jamoList.length; i++) {
     if (initials.includes(jamoList[i])) {
       flushBuffer(last, i);
-      i = checkWord(i);
+      i = checkWord(i, 1);
     } else {
       flushBuffer(last, i+1);
     }
@@ -787,6 +785,8 @@ function combineJamoList(jamoList) {
   // push version without final
   combinations.push(result.join(''));
 
+  console.log(combinations)
+  
   // check if any are valid words
   for (var i = 0; i < combinations.length; i++) {
     if (filteredArray.includes(combinations[i])) {
