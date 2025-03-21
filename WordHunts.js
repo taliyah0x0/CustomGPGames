@@ -423,9 +423,9 @@ class WordHunts extends SimpleScene {
       }
       let point_val = 100;
       if (languages == "kr") {
-        if (word_chosen.length > 3) point_val = (word_chosen.length - 3) * 400; // set the point increase
+        if (word_chosen.length > 3) point_val = (word_chosen.length - 3) * 400 + 200 * (word_chosen.length >= 6); // set the point increase
       } else {
-        if (input_word.length > 3) point_val = (input_word.length - 3) * 400; // set the point increase
+        if (input_word.length > 3) point_val = (input_word.length - 3) * 400 + 200 * (word_chosen.length >= 6); // set the point increase
       }
       document.getElementsByClassName("wh-floating-text")[0].innerHTML += ` (+${point_val})`; // set the preview points
       this.chain.setTint(0xa8fc98); // switch to green
@@ -451,9 +451,9 @@ class WordHunts extends SimpleScene {
       setTextArray(this, this.words, num_words.toString(), "_w"); // increase the word count
       let point_val = 100;
       if (languages == "kr") {
-        if (word_chosen.length > 3) point_val = (word_chosen.length - 3) * 400; // set the appropriate point increase
+        if (word_chosen.length > 3) point_val = (word_chosen.length - 3) * 400 + 200 * (word_chosen.length >= 6); // set the appropriate point increase
       } else {
-        if (input_word.length > 3) point_val = (input_word.length - 3) * 400; // set the appropriate point increase
+        if (input_word.length > 3) point_val = (input_word.length - 3) * 400 + 200 * (input_word.length >= 6); // set the appropriate point increase
       }
       set_limit += point_val;
       this.time.addEvent({ // start the point incrementing animation
@@ -614,7 +614,7 @@ class WordHunts extends SimpleScene {
         
         // create the associated points
         let point_val = 100;
-        if (words[i].length > 3) point_val = (words[i].length - 3) * 400;
+        if (words[i].length > 3) point_val = (words[i].length - 3) * 400 + 200 * (words[i].length >= 6);
         let dispVal = point_val.toString();
         for (var j = 0; j < dispVal.length; j++) {
           let blank_val = this.add.sprite(deviceWidth * (435 / iphoneWidth) - j * deviceWidth * (21 / iphoneWidth), deviceHeight * ((705 + i * 55) / iphoneHeight), dispVal[dispVal.length - j - 1] + "_f");
@@ -786,7 +786,7 @@ function combineJamoList(jamoList) {
   combinations.push(result.join(''));
 
   console.log(combinations)
-  
+
   // check if any are valid words
   for (var i = 0; i < combinations.length; i++) {
     if (filteredArray.includes(combinations[i])) {
