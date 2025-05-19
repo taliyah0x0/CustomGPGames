@@ -1,5 +1,5 @@
 // TALIYAH HUANG
-/* Custom GamePigeon Games -- options selection for Word Hunt */
+/* Custom GameParakeet Games -- options selection for Word Hunt */
 
 let huntconfig = {
   type: Phaser.AUTO,
@@ -79,7 +79,7 @@ function startHuntGame() {
     .then((data) => {
       // combine all arrays into a single array
       const combinedArray = Object.values(data).flat();
-      if (dict == "kr-ken") {
+      if (dict == "kr-ken") { // don't filter out less than 3 characters for korean
         filteredArray = combinedArray;
       } else {
         filteredArray = combinedArray.filter((word) => word.length >= 3);

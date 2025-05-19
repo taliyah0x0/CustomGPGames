@@ -1,5 +1,5 @@
 // TALIYAH HUANG
-/* Custom GamePigeon Games -- main setup */
+/* Custom GameParakeet Games -- main setup */
 
 let iphoneWidth = 980;
 let iphoneHeight = 1642;

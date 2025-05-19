@@ -1,5 +1,5 @@
 // TALIYAH HUANG
-/* Custom GamePigeon Games -- main game functionality in Phaser for Anagrams */
+/* Custom GameParakeet Games -- main game functionality in Phaser for Anagrams */
 
 let letter_chain = []; // letters currently being selected
 let letter_chosen = []; // indices of letters currently being selected
@@ -61,7 +61,7 @@ class Anagrams extends SimpleScene {
     this.load.audio("begin", "audio/begin.mp3");
     this.load.audio("tiktik", "audio/tiktik.mp3");
     this.load.audio("complete", "audio/complete.mp3");
-    this.load.audio("music", "audio/music.mp3");
+    this.load.audio("music", "audio/music.m4a");
     this.load.audio("shuffle", "audio/shuffle.mp3");
   }
 
@@ -182,7 +182,7 @@ class Anagrams extends SimpleScene {
 
     // create the number to keep count of words
     this.words = [];
-    let word_num = this.add.sprite(deviceWidth * (490 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (604 / iphoneHeight), "0_w");
+    let word_num = this.add.sprite(deviceWidth * (490 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (600 / iphoneHeight), "0_w");
     word_num.setOrigin(0, 0.5);
     word_num.setScale(scaleFactor);
     this.words.push(word_num);
@@ -190,7 +190,7 @@ class Anagrams extends SimpleScene {
     // create the number to keep count of points
     this.points = [];
     for (var i = 0; i < 4; i++) {
-      let point = this.add.sprite(deviceWidth * (590 / iphoneWidth) + i * (deviceWidth * (50 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (657 / iphoneHeight), "0_p");
+      let point = this.add.sprite(deviceWidth * (590 / iphoneWidth) + i * (deviceWidth * (50 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (665 / iphoneHeight), "0_p");
       point.setOrigin(0, 0.5);
       point.setScale(scaleFactor);
       this.points.push(point);

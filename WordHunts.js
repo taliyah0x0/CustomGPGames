@@ -1,5 +1,5 @@
 // TALIYAH HUANG
-/* Custom GamePigeon Games -- main game functionality for Word Hunt */
+/* Custom GameParakeet Games -- main game functionality for Word Hunt */
 
 let letter_chain = []; // letters being selected as an array
 let word_chosen = ""; // letters being selected as a string
@@ -48,7 +48,7 @@ class WordHunts extends SimpleScene {
     }
     this.load.image(":_t", "numbers/timer/:.png");
     
-    this.load.audio("music", "audio/whmusic.mp3")
+    this.load.audio("music", "audio/whmusic.m4a")
     this.load.audio("begin", "audio/begin.mp3");
     this.load.audio("tiktik", "audio/tiktik.mp3");
     this.load.audio("complete", "audio/complete.mp3");
@@ -229,6 +229,7 @@ class WordHunts extends SimpleScene {
       for (var i = 0; i < rows * cols; i++) { // clear the white selection on the letters
         if (this.letterFills[i].alpha == 0.9) {
           if (sound) this.deselect.play();
+          this.letterFills[i].setTint(0xffffff);
           this.tweens.add({
             targets: this.letterFills[i],
             alpha: 0.01,
@@ -263,7 +264,7 @@ class WordHunts extends SimpleScene {
 
     // create the number of words count
     this.words = [];
-    let word_num = this.add.sprite(deviceWidth * (490 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (97 / iphoneHeight), "0_w");
+    let word_num = this.add.sprite(deviceWidth * (490 / iphoneWidth) + deviceWidth + no_start * -deviceWidth, deviceHeight * (95 / iphoneHeight), "0_w");
     word_num.setOrigin(0, 0.5);
     word_num.setScale(scaleFactor);
     this.words.push(word_num);
@@ -271,7 +272,7 @@ class WordHunts extends SimpleScene {
     // create the points count
     this.points = [];
     for (var i = 0; i < 4; i++) {
-      let point = this.add.sprite(deviceWidth * (590 / iphoneWidth) + i * (deviceWidth * (50 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (150 / iphoneHeight), "0_p");
+      let point = this.add.sprite(deviceWidth * (590 / iphoneWidth) + i * (deviceWidth * (50 / iphoneWidth)) + deviceWidth + no_start * -deviceWidth, deviceHeight * (160 / iphoneHeight), "0_p");
       point.setOrigin(0, 0.5);
       point.setScale(scaleFactor);
       this.points.push(point);
@@ -429,8 +430,18 @@ class WordHunts extends SimpleScene {
       }
       document.getElementsByClassName("wh-floating-text")[0].innerHTML += ` (+${point_val})`; // set the preview points
       this.chain.setTint(0xa8fc98); // switch to green
+      for (var i = 0; i < this.letterFills.length; i++) {
+        if (this.letterFills[i].alpha > 0.5) {
+          this.letterFills[i].setTint(0xa8fc98);
+        }
+      }
     } else if (filteredArray.includes(input_word) && words.includes(input_word)) { // word was already used
       this.chain.setTint(0xedea88); // switch to yellow
+      for (var i = 0; i < this.letterFills.length; i++) {
+        if (this.letterFills[i].alpha > 0.5) {
+          this.letterFills[i].setTint(0xedea88);
+        }
+      }
       if (sound) this.select.play();
     } else {
       if (sound) this.select.play();
